@@ -638,28 +638,28 @@ static int ov65_0222DED4(int param0)
     return v0;
 }
 
-static int ov65_0222DF88(UnkStruct_ov65_0222EBE0 *param0)
+static int CountValidBattlePokemon(UnkStruct_ov65_0222EBE0 *trainer)
 {
-    Party *v0 = SaveData_GetParty(param0->saveData);
-    Pokemon *v1;
-    int v2 = Party_GetCurrentCount(v0);
-    int v3, v4 = 0;
+    Party *party = SaveData_GetParty(trainer->saveData);
+    Pokemon *mon;
+    int partyCount = Party_GetCurrentCount(party);
+    int i, total = 0;
 
-    for (v3 = 0; v3 < v2; v3++) {
-        v1 = Party_GetPokemonBySlotIndex(v0, v3);
+    for (i = 0; i < partyCount; i++) {
+        mon = Party_GetPokemonBySlotIndex(party, i);
 
-        if (Pokemon_GetValue(v1, MON_DATA_HP, NULL) == 0) {
+        if (Pokemon_GetValue(mon, MON_DATA_HP, NULL) == 0) {
             continue;
         }
 
-        if (Pokemon_GetValue(v1, MON_DATA_IS_EGG, NULL)) {
+        if (Pokemon_GetValue(mon, MON_DATA_IS_EGG, NULL)) {
             continue;
         }
 
-        v4++;
+        total++;
     }
 
-    return v4;
+    return total;
 }
 
 static void ov65_0222DFD4(int param0)
@@ -2203,7 +2203,7 @@ static int ov65_0222FCDC(UnkStruct_ov65_0222EBE0 *param0, int param1)
             param0->unk_3AC = 10;
             param0->unk_3A8 = 34;
             sub_02038350();
-        } else if (0 == sub_0202AF94(param0->unk_00)) {
+        } else if (0 == GetTotalValidFriendDataCount(param0->unk_00)) {
             ov65_02232B58(param0, 26, 1);
             param0->unk_3A8 = 59;
             param0->unk_3BC = 1;
@@ -2264,7 +2264,7 @@ static void ov65_0222FD70(UnkStruct_ov65_0222EBE0 *param0)
                 v0 = TEXT_COLOR(3, 4, 0);
             }
 
-            Strbuf_CopyChars(param0->unk_170, sub_0202AEF0(param0->unk_00, ov4_021D2388()));
+            Strbuf_CopyChars(param0->unk_170, GetFriendTrainerName(param0->unk_00, ov4_021D2388()));
         }
     } else {
         MessageLoader_GetStrbuf(param0->unk_168, v3, param0->unk_170);
@@ -3234,7 +3234,7 @@ static int ov65_02230E04(UnkStruct_ov65_0222EBE0 *param0, int param1)
 static int ov65_02230FBC(UnkStruct_ov65_0222EBE0 *param0, int param1)
 {
     u32 v0;
-    int v1 = ov65_0222DF88(param0);
+    int v1 = CountValidBattlePokemon(param0);
     int v2 = ov65_022319B8(param0);
 
     ov65_022355FC(&param0->unk_3EC);
@@ -3841,7 +3841,7 @@ static int ov65_02231A98(UnkStruct_ov65_0222EBE0 *param0, int param1)
             param0->unk_3E2 = v2;
 
             if (v2 != 0) {
-                int v9 = ov65_0222DF88(param0);
+                int v9 = CountValidBattlePokemon(param0);
                 int v10 = ov65_022319B8(param0);
 
                 v8 = ov65_02234FA8(param0, v2 - 1);
@@ -4725,11 +4725,11 @@ static void ov65_02232CA8(UnkStruct_ov65_0222EBE0 *param0, int param1)
 static void ov65_02232DC0(UnkStruct_ov65_0222EBE0 *param0, int param1)
 {
     if (param1 != -1) {
-        TrainerInfo *v0 = TrainerInfo_New(HEAP_ID_54);
+        TrainerInfo *friendTrainerInfo = TrainerInfo_New(HEAP_ID_54);
 
-        TrainerInfo_SetName(v0, sub_0202AEF0(param0->unk_00, param1));
-        StringTemplate_SetPlayerName(param0->unk_164, 0, v0);
-        Heap_Free(v0);
+        TrainerInfo_SetName(friendTrainerInfo, GetFriendTrainerName(param0->unk_00, param1));
+        StringTemplate_SetPlayerName(param0->unk_164, 0, friendTrainerInfo);
+        Heap_Free(friendTrainerInfo);
     }
 }
 
@@ -6097,7 +6097,7 @@ static void ov65_02234F68(UnkStruct_ov65_0222EBE0 *param0, int param1)
     if (param1 != -1) {
         TrainerInfo *v0 = TrainerInfo_New(HEAP_ID_54);
 
-        TrainerInfo_SetName(v0, sub_0202AEF0(param0->unk_00, param1));
+        TrainerInfo_SetName(v0, GetFriendTrainerName(param0->unk_00, param1));
         StringTemplate_SetPlayerName(param0->unk_BE0.unk_00, 0, v0);
         Heap_Free(v0);
     }

@@ -345,12 +345,12 @@ void ov4_021D2B28(void)
     if (Unk_ov4_0221A408->unk_19E8 != VCT_MODE_CONFERENCE) {
         switch (Unk_ov4_0221A408->unk_19EC) {
         case 0: {
-            if (ov4_021D1E30() == 0) {
+            if (ov4_021D1E30_getNetId() == 0) {
                 if (ov4_021D2974(1)) {
                     Unk_ov4_0221A408->unk_19EC = 1;
                     Unk_ov4_0221A408->unk_1A5A = 60;
                 }
-            } else if (ov4_021D1E30() == 1) {
+            } else if (ov4_021D1E30_getNetId() == 1) {
                 if (ov4_021D29C8(0)) {
                     Unk_ov4_0221A408->unk_19EC = 2;
                 }

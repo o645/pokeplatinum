@@ -3521,29 +3521,29 @@ static BOOL ov114_0225F860(UnkStruct_ov114_0225E854 *param0)
 
 static void ov114_0225F890(UnkStruct_ov114_0225E854 *param0)
 {
-    WiFiList *v0 = SaveData_GetWiFiList(param0->unk_0C.saveData);
-    int v1;
+    WiFiList *wifiList = SaveData_GetWiFiList(param0->unk_0C.saveData);
+    int i;
     int v2, v3;
     int v4;
-    DWCFriendData *v5;
+    DWCFriendData *friendData;
 
-    for (v1 = 0; v1 < param0->unk_0C.unk_08; v1++) {
-        v2 = param0->unk_0C.unk_04[v1];
-        v5 = CommInfo_DWCFriendData(v2);
-        v3 = sub_0203909C(param0->unk_0C.saveData, v5, &v4);
+    for (i = 0; i < param0->unk_0C.unk_08; i++) {
+        v2 = param0->unk_0C.unk_04[i];
+        friendData = CommInfo_DWCFriendData(v2);
+        v3 = sub_0203909C(param0->unk_0C.saveData, friendData, &v4);
 
         switch (v3) {
         case 0:
         case 1:
             switch (param0->unk_07) {
             case UnkEnum_ov66_022324D0_00:
-                sub_0202B1F8(v0, v4, 1);
+                sub_0202B1F8(wifiList, v4, 1);
                 break;
             case UnkEnum_ov66_022324D0_01:
-                sub_0202B220(v0, v4, 1);
+                sub_0202B220(wifiList, v4, 1);
                 break;
             case UnkEnum_ov66_022324D0_02:
-                sub_0202B248(v0, v4, 1);
+                sub_0202B248(wifiList, v4, 1);
                 break;
             }
             break;

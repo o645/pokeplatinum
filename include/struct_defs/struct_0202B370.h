@@ -6,8 +6,8 @@
 #include "struct_defs/struct_0202B370_sub1.h"
 
 typedef struct WiFiList_t {
-    DWCUserData unk_00;
-    DWCFriendData unk_40[32];
+    DWCUserData userData;
+    DWCFriendData friendData[32];
     UnkStruct_0202B370_sub1 unk_1C0[32];
 } WiFiList;
 

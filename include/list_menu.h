@@ -97,6 +97,12 @@ struct ListMenu {
 };
 
 ListMenu *ListMenu_New(const ListMenuTemplate *template, u16 startListPos, u16 startCursorPos, u8 heapID);
+
+/**
+ * Processes Player input for Listmenu, returning the chosen option.
+ * @param *menu pointer to listmenu.
+ * @return Chosen option, or 0xffffffff for Nothing Chosen, or 0xfffffffe For Cancel
+ */
 u32 ListMenu_ProcessInput(ListMenu *menu);
 void ListMenu_Free(ListMenu *menu, u16 *outListPos, u16 *outCursorPos);
 void ListMenu_Draw(ListMenu *menu);

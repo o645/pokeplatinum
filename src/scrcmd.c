@@ -7250,7 +7250,7 @@ static BOOL ScrCmd_2A4(ScriptContext *ctx)
 {
     u16 *v0 = ScriptContext_GetVarPointer(ctx);
 
-    *v0 = sub_0202AF94(SaveData_GetWiFiList(ctx->fieldSystem->saveData));
+    *v0 = GetTotalValidFriendDataCount(SaveData_GetWiFiList(ctx->fieldSystem->saveData));
     return FALSE;
 }
 

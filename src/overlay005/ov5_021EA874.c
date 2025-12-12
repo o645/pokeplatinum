@@ -33,22 +33,22 @@
 #include "unk_0203909C.h"
 
 typedef struct {
-    StringList *unk_00;
-    ListMenu *unk_04;
-    Strbuf *unk_08;
+    StringList *choices;
+    ListMenu *menu;
+    Strbuf *buffer;
     Strbuf *unk_0C;
-    Window unk_10;
-    Window unk_20;
+    Window window;
+    Window currentWindow;
     FieldSystem *fieldSystem;
     SaveData *saveData;
-    StringTemplate *unk_38;
-    MessageLoader *unk_3C;
-    int unk_40;
-    Menu *unk_44;
+    StringTemplate *trainerNameTemplate;
+    MessageLoader *messageLoader;
+    int printerId;
+    Menu *yesNoChoice;
     int unk_48;
     int unk_4C[8];
     int unk_6C[8];
-    int unk_8C;
+    int netId;
     int unk_90;
 } UnkStruct_ov5_021EAE78;
 
@@ -56,17 +56,17 @@ static void ov5_021EAE78(UnkStruct_ov5_021EAE78 *param0, int param1);
 static void ov5_021EAF1C(UnkStruct_ov5_021EAE78 *param0);
 static void ov5_021EAF90(ListMenu *param0, u32 param1, u8 param2);
 
-static BOOL ov5_021EA874(UnkStruct_ov5_021EAE78 *param0)
+static BOOL ov5_021EA874(UnkStruct_ov5_021EAE78 *param0) // Init function for this?
 {
     int v0, v1 = 0;
-    DWCFriendData *v2 = sub_0202AED8(SaveData_GetWiFiList(param0->saveData), 0);
+    DWCFriendData *friendData = GetFriendDataById(SaveData_GetWiFiList(param0->saveData), 0);
     DWCFriendData *v3;
 
     if (0 == sub_020391DC(param0->saveData, param0->unk_4C, HEAP_ID_FIELD1)) {
         return 1;
     }
 
-    param0->unk_8C = 0;
+    param0->netId = 0;
 
     LoadMessageBoxGraphics(param0->fieldSystem->bgConfig, 3, (512 - (18 + 12)), 10, Options_Frame(SaveData_GetOptions(param0->saveData)), HEAP_ID_FIELD1);
     LoadStandardWindowGraphics(param0->fieldSystem->bgConfig, 3, 1024 - (18 + 12) - 9, 11, 0, HEAP_ID_FIELD1);
@@ -75,44 +75,44 @@ static BOOL ov5_021EA874(UnkStruct_ov5_021EAE78 *param0)
     return 0;
 }
 
-static BOOL ov5_021EA8F0(UnkStruct_ov5_021EAE78 *param0)
+static BOOL ov5_021EA8F0(UnkStruct_ov5_021EAE78 *connectedSystem)
 {
-    int v0;
-    TrainerInfo *v1;
+    int i;
+    TrainerInfo *trainerInfo;
 
-    param0->unk_8C = -1;
+    connectedSystem->netId = -1;
 
-    for (v0 = 0; v0 < CommSys_ConnectedCount(); v0++) {
-        if (param0->unk_4C[v0] == 2) {
-            param0->unk_8C = v0;
-            param0->unk_4C[v0] = 0;
+    for (i = 0; i < CommSys_ConnectedCount(); i++) {
+        if (connectedSystem->unk_4C[i] == 2) {
+            connectedSystem->netId = i;
+            connectedSystem->unk_4C[i] = 0;
             break;
         }
     }
 
-    if (param0->unk_8C == -1) {
+    if (connectedSystem->netId == -1) { // no connected system
         return 1;
     }
 
-    if (Bag_CanRemoveItem(SaveData_GetBag(param0->saveData), ITEM_PAL_PAD, 1, HEAP_ID_FIELD1) == TRUE) {
-        v1 = CommInfo_TrainerInfo(param0->unk_8C);
-        StringTemplate_SetPlayerName(param0->unk_38, 0, v1);
-        ov5_021EAE78(param0, 57);
-        param0->unk_48 = 2;
+    if (Bag_CanRemoveItem(SaveData_GetBag(connectedSystem->saveData), ITEM_PAL_PAD, 1, HEAP_ID_FIELD1) == TRUE) {
+        trainerInfo = CommInfo_TrainerInfo(connectedSystem->netId);
+        StringTemplate_SetPlayerName(connectedSystem->trainerNameTemplate, 0, trainerInfo);
+        ov5_021EAE78(connectedSystem, 57);
+        connectedSystem->unk_48 = 2;
         return 0;
     }
 
     {
-        WiFiList *v2 = SaveData_GetWiFiList(param0->saveData);
+        WiFiList *wifiLIst = SaveData_GetWiFiList(connectedSystem->saveData);
 
-        for (v0 = 0; v0 < 32; v0++) {
-            if (!sub_0202AF78(v2, v0)) {
-                sub_02039298(param0->saveData, param0->unk_8C, v0, HEAP_ID_FIELD1, 0);
+        for (i = 0; i < 32; i++) {
+            if (!wifiSlotHasValidFriendData(wifiLIst, i)) {
+                AddFriendToPalPad(connectedSystem->saveData, connectedSystem->netId, i, HEAP_ID_FIELD1, 0);
                 break;
             }
         }
     }
-    param0->unk_48 = 1;
+    connectedSystem->unk_48 = 1;
     return 0;
 }
 
@@ -128,8 +128,8 @@ static const WindowTemplate Unk_ov5_021FAF00 = {
 
 static BOOL ov5_021EA9BC(UnkStruct_ov5_021EAE78 *param0)
 {
-    if (Text_IsPrinterActive(param0->unk_40) == 0) {
-        param0->unk_44 = Menu_MakeYesNoChoice(param0->fieldSystem->bgConfig, &Unk_ov5_021FAF00, 1024 - (18 + 12) - 9, 11, 4);
+    if (Text_IsPrinterActive(param0->printerId) == 0) {
+        param0->yesNoChoice = Menu_MakeYesNoChoice(param0->fieldSystem->bgConfig, &Unk_ov5_021FAF00, 1024 - (18 + 12) - 9, 11, 4);
         param0->unk_48 = 3;
     }
 
@@ -141,7 +141,7 @@ static BOOL ov5_021EA9F8(UnkStruct_ov5_021EAE78 *param0)
     DWCFriendData *v0;
     Strbuf *v1;
     int v2;
-    int v3 = Menu_ProcessInputAndHandleExit(param0->unk_44, HEAP_ID_FIELD1);
+    int v3 = Menu_ProcessInputAndHandleExit(param0->yesNoChoice, HEAP_ID_FIELD1);
 
     if (v3 == 0xffffffff) {
         return 0;
@@ -149,8 +149,8 @@ static BOOL ov5_021EA9F8(UnkStruct_ov5_021EAE78 *param0)
         WiFiList *v4 = SaveData_GetWiFiList(param0->saveData);
 
         for (v2 = 0; v2 < 32; v2++) {
-            if (!sub_0202AF78(v4, v2)) {
-                sub_02039298(param0->saveData, param0->unk_8C, v2, HEAP_ID_FIELD1, 0);
+            if (!wifiSlotHasValidFriendData(v4, v2)) {
+                AddFriendToPalPad(param0->saveData, param0->netId, v2, HEAP_ID_FIELD1, 0);
                 break;
             }
         }
@@ -168,8 +168,8 @@ static BOOL ov5_021EA9F8(UnkStruct_ov5_021EAE78 *param0)
 
 static BOOL ov5_021EAA6C(UnkStruct_ov5_021EAE78 *param0)
 {
-    if (Text_IsPrinterActive(param0->unk_40) == 0) {
-        param0->unk_44 = Menu_MakeYesNoChoice(param0->fieldSystem->bgConfig, &Unk_ov5_021FAF00, 1024 - (18 + 12) - 9, 11, 4);
+    if (Text_IsPrinterActive(param0->printerId) == 0) {
+        param0->yesNoChoice = Menu_MakeYesNoChoice(param0->fieldSystem->bgConfig, &Unk_ov5_021FAF00, 1024 - (18 + 12) - 9, 11, 4);
         param0->unk_48 = 5;
     }
 
@@ -182,15 +182,15 @@ static BOOL ov5_021EAAA8(UnkStruct_ov5_021EAE78 *param0)
     DWCFriendData *v1;
     Strbuf *v2;
     int v3;
-    int v4 = Menu_ProcessInputAndHandleExit(param0->unk_44, 4);
+    int v4 = Menu_ProcessInputAndHandleExit(param0->yesNoChoice, 4);
 
     if (v4 == 0xffffffff) {
         return 0;
     } else if (v4 == 0) {
         param0->unk_48 = 8;
     } else {
-        v0 = CommInfo_TrainerInfo(param0->unk_8C);
-        StringTemplate_SetPlayerName(param0->unk_38, 0, v0);
+        v0 = CommInfo_TrainerInfo(param0->netId);
+        StringTemplate_SetPlayerName(param0->trainerNameTemplate, 0, v0);
         ov5_021EAE78(param0, 59);
         param0->unk_48 = 6;
     }
@@ -200,8 +200,8 @@ static BOOL ov5_021EAAA8(UnkStruct_ov5_021EAE78 *param0)
 
 static BOOL ov5_021EAAEC(UnkStruct_ov5_021EAE78 *param0)
 {
-    if (Text_IsPrinterActive(param0->unk_40) == 0) {
-        param0->unk_44 = Menu_MakeYesNoChoice(param0->fieldSystem->bgConfig, &Unk_ov5_021FAF00, 1024 - (18 + 12) - 9, 11, 4);
+    if (Text_IsPrinterActive(param0->printerId) == 0) {
+        param0->yesNoChoice = Menu_MakeYesNoChoice(param0->fieldSystem->bgConfig, &Unk_ov5_021FAF00, 1024 - (18 + 12) - 9, 11, 4);
         param0->unk_48 = 7;
     }
 
@@ -214,7 +214,7 @@ static BOOL ov5_021EAB28(UnkStruct_ov5_021EAE78 *param0)
     DWCFriendData *v1;
     Strbuf *v2;
     int v3;
-    int v4 = Menu_ProcessInputAndHandleExit(param0->unk_44, 4);
+    int v4 = Menu_ProcessInputAndHandleExit(param0->yesNoChoice, 4);
 
     if (v4 == 0xffffffff) {
         return 0;
@@ -252,41 +252,41 @@ static const ListMenuTemplate Unk_ov5_021FAF08 = {
 
 static BOOL ov5_021EAB58(UnkStruct_ov5_021EAE78 *param0)
 {
-    WiFiList *v0 = SaveData_GetWiFiList(param0->saveData);
+    WiFiList *wifiList = SaveData_GetWiFiList(param0->saveData);
     ListMenuTemplate v1;
-    int v2 = sub_0202AF94(v0);
+    int totalValidFriendData = GetTotalValidFriendDataCount(wifiList);
     int v3 = 5;
 
-    param0->unk_00 = StringList_New(v2 + 1, HEAP_ID_FIELD1);
+    param0->choices = StringList_New(totalValidFriendData + 1, HEAP_ID_FIELD1);
 
-    Window_Add(param0->fieldSystem->bgConfig, &param0->unk_20, 3, 19, 1, 12, v3 * 2, 13, (((1024 - (18 + 12) - 9 - (32 * 8)) - (18 + 12 + 24)) - (27 * 4)) - (10 * (v3 + 2) * 2));
-    Window_DrawStandardFrame(&param0->unk_20, 1, 1024 - (18 + 12) - 9, 11);
+    Window_Add(param0->fieldSystem->bgConfig, &param0->currentWindow, 3, 19, 1, 12, v3 * 2, 13, (((1024 - (18 + 12) - 9 - (32 * 8)) - (18 + 12 + 24)) - (27 * 4)) - (10 * (v3 + 2) * 2));
+    Window_DrawStandardFrame(&param0->currentWindow, 1, 1024 - (18 + 12) - 9, 11);
 
     {
-        MessageLoader *v4;
-        int v5 = 0;
+        MessageLoader *messageLoader;
+        int i = 0;
 
-        for (v5 = 0; v5 < 32; v5++) {
-            if (sub_0202AF78(v0, v5)) {
-                Strbuf_CopyChars(param0->unk_08, sub_0202AEF0(v0, v5));
-                StringList_AddFromStrbuf(param0->unk_00, param0->unk_08, v5);
+        for (i = 0; i < 32; i++) {
+            if (wifiSlotHasValidFriendData(wifiList, i)) {
+                Strbuf_CopyChars(param0->buffer, GetFriendTrainerName(wifiList, i));
+                StringList_AddFromStrbuf(param0->choices, param0->buffer, i);
             }
         }
 
-        StringList_AddFromMessageBank(param0->unk_00, param0->unk_3C, 11, 0xfffffffe);
+        StringList_AddFromMessageBank(param0->choices, param0->messageLoader, 11, LIST_CANCEL);
     }
 
     v1 = Unk_ov5_021FAF08;
 
-    v1.count = v2 + 1;
+    v1.count = totalValidFriendData + 1;
     v1.maxDisplay = v3;
-    v1.choices = param0->unk_00;
-    v1.window = &param0->unk_20;
+    v1.choices = param0->choices;
+    v1.window = &param0->currentWindow;
     v1.cursorCallback = ov5_021EAF90;
     v1.parent = param0;
 
-    param0->unk_04 = ListMenu_New(&v1, 0, 0, HEAP_ID_FIELD1);
-    Window_CopyToVRAM(&param0->unk_20);
+    param0->menu = ListMenu_New(&v1, 0, 0, HEAP_ID_FIELD1);
+    Window_CopyToVRAM(&param0->currentWindow);
     param0->unk_48 = 9;
 
     return 0;
@@ -294,47 +294,47 @@ static BOOL ov5_021EAB58(UnkStruct_ov5_021EAE78 *param0)
 
 static BOOL ov5_021EAC44(UnkStruct_ov5_021EAE78 *param0)
 {
-    TrainerInfo *v0;
-    int v1 = ListMenu_ProcessInput(param0->unk_04);
+    TrainerInfo *trainerInfo;
+    int option = ListMenu_ProcessInput(param0->menu);
 
-    switch (v1) {
-    case 0xffffffff:
+    switch (option) {
+    case LIST_NOTHING_CHOSEN:
         return 0;
-    case 0xfffffffe:
+    case LIST_CANCEL:
         Sound_PlayEffect(SEQ_SE_CONFIRM);
-        v0 = CommInfo_TrainerInfo(param0->unk_8C);
-        StringTemplate_SetPlayerName(param0->unk_38, 0, v0);
+        trainerInfo = CommInfo_TrainerInfo(param0->netId);
+        StringTemplate_SetPlayerName(param0->trainerNameTemplate, 0, trainerInfo);
         ov5_021EAE78(param0, 59);
         param0->unk_48 = 6;
         break;
     default:
         Sound_PlayEffect(SEQ_SE_CONFIRM);
-        param0->unk_90 = v1;
+        param0->unk_90 = option;
 
-        WiFiList *v2 = SaveData_GetWiFiList(param0->saveData);
-        TrainerInfo *v3 = TrainerInfo_New(HEAP_ID_FIELD1);
+        WiFiList *wifiList = SaveData_GetWiFiList(param0->saveData);
+        TrainerInfo *trainerInfo = TrainerInfo_New(HEAP_ID_FIELD1);
 
-        TrainerInfo_SetName(v3, sub_0202AEF0(v2, v1));
-        StringTemplate_SetPlayerName(param0->unk_38, 0, v3);
-        Heap_Free(v3);
+        TrainerInfo_SetName(trainerInfo, GetFriendTrainerName(wifiList, option));
+        StringTemplate_SetPlayerName(param0->trainerNameTemplate, 0, trainerInfo);
+        Heap_Free(trainerInfo);
 
         ov5_021EAE78(param0, 60);
         param0->unk_48 = 10;
         break;
     }
 
-    Window_EraseStandardFrame(&param0->unk_20, 0);
-    Window_Remove(&param0->unk_20);
-    ListMenu_Free(param0->unk_04, NULL, NULL);
-    StringList_Free(param0->unk_00);
+    Window_EraseStandardFrame(&param0->currentWindow, 0);
+    Window_Remove(&param0->currentWindow);
+    ListMenu_Free(param0->menu, NULL, NULL);
+    StringList_Free(param0->choices);
 
     return 0;
 }
 
 static BOOL ov5_021EACFC(UnkStruct_ov5_021EAE78 *param0)
 {
-    if (Text_IsPrinterActive(param0->unk_40) == 0) {
-        param0->unk_44 = Menu_MakeYesNoChoice(param0->fieldSystem->bgConfig, &Unk_ov5_021FAF00, 1024 - (18 + 12) - 9, 11, 4);
+    if (Text_IsPrinterActive(param0->printerId) == 0) {
+        param0->yesNoChoice = Menu_MakeYesNoChoice(param0->fieldSystem->bgConfig, &Unk_ov5_021FAF00, 1024 - (18 + 12) - 9, 11, 4);
         param0->unk_48 = 11;
     }
 
@@ -344,21 +344,21 @@ static BOOL ov5_021EACFC(UnkStruct_ov5_021EAE78 *param0)
 static BOOL ov5_021EAD38(UnkStruct_ov5_021EAE78 *param0)
 {
     WiFiList *v0 = SaveData_GetWiFiList(param0->saveData);
-    TrainerInfo *v1;
+    TrainerInfo *trainerInfo;
     DWCFriendData *v2;
     Strbuf *v3;
-    int v4 = Menu_ProcessInputAndHandleExit(param0->unk_44, HEAP_ID_FIELD1);
+    int optionChosen = Menu_ProcessInputAndHandleExit(param0->yesNoChoice, HEAP_ID_FIELD1);
 
-    if (v4 == 0xffffffff) {
+    if (optionChosen == LIST_NOTHING_CHOSEN) {
         return 0;
-    } else if (v4 == 0) {
+    } else if (optionChosen == 0) {
         sub_02030788(SaveData_GetBattleFrontier(param0->saveData), param0->unk_90);
         sub_0202AFD4(v0, param0->unk_90);
-        sub_02039298(param0->saveData, param0->unk_8C, 32 - 1, HEAP_ID_FIELD1, 0);
+        AddFriendToPalPad(param0->saveData, param0->netId, 32 - 1, HEAP_ID_FIELD1, 0);
         param0->unk_48 = 1;
     } else {
-        v1 = CommInfo_TrainerInfo(param0->unk_8C);
-        StringTemplate_SetPlayerName(param0->unk_38, 0, v1);
+        trainerInfo = CommInfo_TrainerInfo(param0->netId);
+        StringTemplate_SetPlayerName(param0->trainerNameTemplate, 0, trainerInfo);
         ov5_021EAE78(param0, 59);
         param0->unk_48 = 6;
     }
@@ -422,39 +422,39 @@ static BOOL ov5_021EADB4(FieldTask *param0)
     return 0;
 }
 
-static void ov5_021EAE78(UnkStruct_ov5_021EAE78 *param0, int param1)
+static void ov5_021EAE78(UnkStruct_ov5_021EAE78 *system, int entryId)
 {
-    if (Window_IsInUse(&param0->unk_10)) {
-        Window_Remove(&param0->unk_10);
+    if (Window_IsInUse(&system->window)) {
+        Window_Remove(&system->window);
     }
 
-    MessageLoader_GetStrbuf(param0->unk_3C, param1, param0->unk_08);
-    StringTemplate_Format(param0->unk_38, param0->unk_0C, param0->unk_08);
-    FieldMessage_AddWindow(param0->fieldSystem->bgConfig, &param0->unk_10, 3);
-    FieldMessage_DrawWindow(&param0->unk_10, SaveData_GetOptions(param0->fieldSystem->saveData));
+    MessageLoader_GetStrbuf(system->messageLoader, entryId, system->buffer);
+    StringTemplate_Format(system->trainerNameTemplate, system->unk_0C, system->buffer);
+    FieldMessage_AddWindow(system->fieldSystem->bgConfig, &system->window, 3);
+    FieldMessage_DrawWindow(&system->window, SaveData_GetOptions(system->fieldSystem->saveData));
 
-    param0->unk_40 = FieldMessage_Print(&param0->unk_10, param0->unk_0C, SaveData_GetOptions(param0->fieldSystem->saveData), 1);
+    system->printerId = FieldMessage_Print(&system->window, system->unk_0C, SaveData_GetOptions(system->fieldSystem->saveData), 1);
 }
 
 static void ov5_021EAEE0(UnkStruct_ov5_021EAE78 *param0)
 {
     MI_CpuClear8(param0, sizeof(UnkStruct_ov5_021EAE78));
 
-    param0->unk_38 = StringTemplate_Default(HEAP_ID_FIELD1);
-    param0->unk_3C = MessageLoader_Init(MSG_LOADER_PRELOAD_ENTIRE_BANK, NARC_INDEX_MSGDATA__PL_MSG, TEXT_BANK_UNK_0675, HEAP_ID_FIELD1);
+    param0->trainerNameTemplate = StringTemplate_Default(HEAP_ID_FIELD1);
+    param0->messageLoader = MessageLoader_Init(MSG_LOADER_PRELOAD_ENTIRE_BANK, NARC_INDEX_MSGDATA__PL_MSG, TEXT_BANK_UNK_0675, HEAP_ID_FIELD1);
     param0->unk_0C = Strbuf_Init(110, HEAP_ID_FIELD1);
-    param0->unk_08 = Strbuf_Init(110, HEAP_ID_FIELD1);
+    param0->buffer = Strbuf_Init(110, HEAP_ID_FIELD1);
 }
 
 static void ov5_021EAF1C(UnkStruct_ov5_021EAE78 *param0)
 {
-    MessageLoader_Free(param0->unk_3C);
-    StringTemplate_Free(param0->unk_38);
+    MessageLoader_Free(param0->messageLoader);
+    StringTemplate_Free(param0->trainerNameTemplate);
     Strbuf_Free(param0->unk_0C);
-    Strbuf_Free(param0->unk_08);
+    Strbuf_Free(param0->buffer);
 
-    if (Window_IsInUse(&param0->unk_10)) {
-        Window_Remove(&param0->unk_10);
+    if (Window_IsInUse(&param0->window)) {
+        Window_Remove(&param0->window);
     }
 }
 
@@ -477,7 +477,7 @@ void ov5_021EAF50(FieldSystem *fieldSystem)
     }
 }
 
-static void ov5_021EAF90(ListMenu *param0, u32 param1, u8 param2)
+static void ov5_021EAF90(ListMenu *listMenuUnused, u32 param1Unused, u8 param2)
 {
     if (param2 == 0) {
         Sound_PlayEffect(SEQ_SE_CONFIRM);

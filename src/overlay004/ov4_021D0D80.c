@@ -144,7 +144,7 @@ int ov4_021D0D80(SaveData *saveData, int heapID, int param2, int param3)
 
     if (saveData != NULL) {
         Unk_ov4_0221A400->unk_F08 = WiFiList_GetUserData(SaveData_GetWiFiList(Unk_ov4_0221A400->saveData));
-        Unk_ov4_0221A400->unk_100 = (DWCFriendData *)sub_0202AED8(SaveData_GetWiFiList(Unk_ov4_0221A400->saveData), 0);
+        Unk_ov4_0221A400->unk_100 = (DWCFriendData *)GetFriendDataById(SaveData_GetWiFiList(Unk_ov4_0221A400->saveData), 0);
     }
 
     Unk_ov4_0221A400->unk_10D9 = 1;
@@ -556,7 +556,7 @@ static void ov4_021D1744(int param0, int param1, void *param2)
 {
 #pragma unused(param2)
 
-    MI_CpuCopy8(Unk_ov4_0221A400->unk_100, sub_0202AED8(SaveData_GetWiFiList(Unk_ov4_0221A400->saveData), 0), 32 * sizeof(DWCFriendData));
+    MI_CpuCopy8(Unk_ov4_0221A400->unk_100, GetFriendDataById(SaveData_GetWiFiList(Unk_ov4_0221A400->saveData), 0), 32 * sizeof(DWCFriendData));
 
     sub_0202B270(SaveData_GetWiFiList(Unk_ov4_0221A400->saveData), param0, param1);
     sub_020307F0(SaveData_GetBattleFrontier(Unk_ov4_0221A400->saveData), param0, param1);
@@ -958,7 +958,7 @@ static int ov4_021D1D1C(void)
     return ov4_021D1B5C();
 }
 
-int ov4_021D1E30()
+int ov4_021D1E30_getNetId()
 {
     if (Unk_ov4_0221A400) {
         if ((Unk_ov4_0221A400->unk_1064 == 7) || (Unk_ov4_0221A400->unk_1064 == 8) || (Unk_ov4_0221A400->unk_1064 == 16)) {

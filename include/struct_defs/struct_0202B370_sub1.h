@@ -8,9 +8,9 @@ typedef struct {
     u16 unk_24;
     u16 unk_26;
     u16 unk_28;
-    u16 unk_2A;
-    u8 unk_2C;
-    u8 unk_2D;
+    u16 year;
+    u8 month;
+    u8 day;
     u8 unk_2E;
     u8 unk_2F;
     u16 unk_30;

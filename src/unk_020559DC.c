@@ -30,22 +30,22 @@
 static void sub_02055AC0(FieldSystem *fieldSystem, s32 param1);
 static void sub_02055B64(FieldSystem *fieldSystem, s32 param1, const RTCTime *param2);
 static void sub_02055A14(FieldSystem *fieldSystem, GameTime *param1, const RTCDate *param2);
-static void inline_020559DC(FieldSystem *fieldSystem, GameTime *param1, const RTCDate *param2, const RTCTime *param3);
+static void checkAndPunishTimeTravel(FieldSystem *fieldSystem, GameTime *param1, const RTCDate *param2, const RTCTime *param3);
 
 void sub_020559DC(FieldSystem *fieldSystem)
 {
-    RTCDate v0;
-    RTCTime v1;
+    RTCDate date;
+    RTCTime time;
     GameTime *v2 = SaveData_GetGameTime(fieldSystem->saveData);
 
     if (v2->canary == FALSE) {
         return;
     }
 
-    GetCurrentDateTime(&v0, &v1);
-    sub_02055A14(fieldSystem, v2, &v0);
+    GetCurrentDateTime(&date, &time);
+    sub_02055A14(fieldSystem, v2, &date);
 
-    inline_020559DC(fieldSystem, v2, &v0, &v1);
+    checkAndPunishTimeTravel(fieldSystem, v2, &date, &time);
 }
 
 static void sub_02055A14(FieldSystem *fieldSystem, GameTime *gameTime, const RTCDate *currentDate)
@@ -60,26 +60,26 @@ static void sub_02055A14(FieldSystem *fieldSystem, GameTime *gameTime, const RTC
     }
 }
 
-static void inline_020559DC(FieldSystem *fieldSystem, GameTime *param1, const RTCDate *param2, const RTCTime *param3)
+static void checkAndPunishTimeTravel(FieldSystem *fieldSystem, GameTime *gameTime, const RTCDate *date, const RTCTime *time)
 {
-    s64 v0, v1;
-    s32 v2;
+    s64 newGameTimeSeconds, lastSavedGameTimeSeconds;
+    s32 minutesTimeTraveled;
 
-    v0 = RTC_ConvertDateTimeToSecond(param2, param3);
-    v1 = RTC_ConvertDateTimeToSecond(&param1->date, &param1->time);
+    newGameTimeSeconds = RTC_ConvertDateTimeToSecond(date, time);
+    lastSavedGameTimeSeconds = RTC_ConvertDateTimeToSecond(&gameTime->date, &gameTime->time);
 
-    if (v0 < v1) {
-        param1->date = *param2;
-        param1->time = *param3;
+    if (newGameTimeSeconds < lastSavedGameTimeSeconds) {
+        gameTime->date = *date;
+        gameTime->time = *time;
     } else {
-        v2 = (v0 - v1) / 60;
+        minutesTimeTraveled = (newGameTimeSeconds - lastSavedGameTimeSeconds) / 60;
 
-        if (v2 > 0) {
-            GameTime_DecrementPenalty(param1, v2);
-            sub_02055B64(fieldSystem, v2, param3);
+        if (minutesTimeTraveled > 0) {
+            GameTime_DecrementPenalty(gameTime, minutesTimeTraveled);
+            sub_02055B64(fieldSystem, minutesTimeTraveled, time);
 
-            param1->date = *param2;
-            param1->time = *param3;
+            gameTime->date = *date;
+            gameTime->time = *time;
         }
     }
 }
@@ -93,10 +93,10 @@ static void sub_02055AC0(FieldSystem *fieldSystem, s32 daysPassed)
     SpecialEncounter_SetMixedRecordDailies(SaveData_GetSpecialEncounters(fieldSystem->saveData), RecordMixedRNG_GetRand(SaveData_GetRecordMixedRNG(fieldSystem->saveData)));
 
     {
-        Party *v0;
+        Party *playerParty;
 
-        v0 = SaveData_GetParty(fieldSystem->saveData);
-        Party_UpdatePokerusStatus(v0, daysPassed);
+        playerParty = SaveData_GetParty(fieldSystem->saveData);
+        Party_UpdatePokerusStatus(playerParty, daysPassed);
     }
 
     {

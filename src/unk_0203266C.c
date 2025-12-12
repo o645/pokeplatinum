@@ -49,7 +49,7 @@ u16 CommLocal_MaxMachines(u16 param0)
     return v0[param0];
 }
 
-u16 sub_02032698(u16 param0)
+u16 GetMinPlayers(u16 param0)
 {
     u8 v0[] = {
         0x1,

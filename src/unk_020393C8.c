@@ -14,7 +14,7 @@
 #include "unk_02033200.h"
 #include "unk_020366A0.h"
 
-static int inline inline_02039614(NetworkIcon *param0);
+static int inline inline_02039614(NetworkIcon *networkIcon);
 static int inline inline_02039614_1(int param0, int param1);
 static void sub_02039428(SysTask *param0, void *param1);
 static void sub_020394D0(int vramType, BOOL unusedIsWifi, u32 offset, u32 heapID);
@@ -26,26 +26,26 @@ static NetworkIcon *CreateNetworkIcon(u32 unused0, u32 heapID, int x, int y, BOO
 
 NetworkIcon *CreateNetworkIcon(u32 unused0, u32 heapID, int x, int y, BOOL isWifi, const UnkStruct_020E5EB4 *unused5[], int vramType)
 {
-    NetworkIcon *v0;
+    NetworkIcon *networkIcon;
 
     sub_020394D0(vramType, isWifi, (16 * 2 * 14), heapID);
     sub_02039530(vramType, isWifi, heapID);
 
-    v0 = (NetworkIcon *)Heap_AllocAtEnd(heapID, sizeof(NetworkIcon));
+    networkIcon = (NetworkIcon *)Heap_AllocAtEnd(heapID, sizeof(NetworkIcon));
 
-    v0->unk_18 = SysTask_ExecuteAfterVBlank(sub_02039428, v0, 5);
-    v0->x = x;
-    v0->y = y;
-    v0->unk_00 = 0;
-    v0->strength = 3;
-    v0->unused_14 = unused5;
-    v0->unk_08 = 0;
-    v0->isWifi = isWifi;
-    v0->unk_12 = 0;
-    v0->screenId = 0;
-    v0->unk_1C = (GXOamAttr *)HW_OAM;
+    networkIcon->unk_18 = SysTask_ExecuteAfterVBlank(sub_02039428, networkIcon, 5);
+    networkIcon->x = x;
+    networkIcon->y = y;
+    networkIcon->unk_00 = 0;
+    networkIcon->strength = 3;
+    networkIcon->unused_14 = unused5;
+    networkIcon->unk_08 = 0;
+    networkIcon->isWifi = isWifi;
+    networkIcon->unk_12 = 0;
+    networkIcon->screenId = 0;
+    networkIcon->unk_1C = (GXOamAttr *)HW_OAM;
 
-    return v0;
+    return networkIcon;
 }
 
 static void sub_02039428(SysTask *param0, void *param1)

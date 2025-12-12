@@ -18,7 +18,7 @@ typedef struct {
     Options *options;
     DWCUserData *unk_14;
     int unk_18;
-    int unk_1C;
+    int userGsProfileId;
     int unk_20;
     int unk_24;
 } UnkStruct_0206BC70;

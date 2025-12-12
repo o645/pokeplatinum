@@ -61,7 +61,7 @@ static const WindowTemplate Unk_020EC2F0 = {
     0x1
 };
 
-static void sub_020528D0(BgConfig *param0)
+static void sub_020528D0(BgConfig *bgConfig)
 {
     static const UnkStruct_02099F80 v0 = {
         GX_VRAM_BG_128_B,
@@ -98,7 +98,7 @@ static void sub_020528D0(BgConfig *param0)
 
     GXLayers_SetBanks(&v0);
     SetAllGraphicsModes(&v1);
-    Bg_InitFromTemplate(param0, BG_LAYER_MAIN_3, &v2, 0);
+    Bg_InitFromTemplate(bgConfig, BG_LAYER_MAIN_3, &v2, 0);
     Graphics_LoadPalette(NARC_INDEX_GRAPHIC__PL_FONT, 6, 0, 13 * 0x20, 0x20, HEAP_ID_FIELD2);
 }
 

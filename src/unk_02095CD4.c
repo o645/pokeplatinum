@@ -22,7 +22,7 @@ void sub_02095DBC(int param0, int param1, void *param2, void *param3);
 void sub_02095DCC(int param0, int param1, void *param2, void *param3);
 static int sub_02095CE8(u8 param0);
 static int sub_02095E78(void);
-static int sub_02095E74(void);
+static int GetPalPadTypeSize(void);
 static u8 *sub_02095E80(int param0, void *param1, int param2);
 static int sub_02095E68(void);
 static int sub_02095E70(void);
@@ -34,7 +34,7 @@ static const CommCmdTable Unk_020F59BC[] = {
     { sub_02095DA4, CommPacketSizeOf_NetId },
     { sub_02095DA8, CommPacketSizeOf_NetId },
     { sub_02095DAC, CommPacketSizeOf_NetId },
-    { sub_02095DFC, sub_02095E74, sub_02095E80 },
+    { sub_02095DFC, GetPalPadTypeSize, sub_02095E80 },
     { sub_02095E28, sub_02095E68, sub_02095E80 },
     { sub_02095DB8, sub_0203294C },
     { sub_02095DBC, CommPacketSizeOf_NetId },
@@ -47,55 +47,55 @@ void sub_02095CD4(void *param0)
     CommCmd_Init(Unk_020F59BC, v0, param0);
 }
 
-static int sub_02095CE8(u8 param0)
+static int sub_02095CE8(u8 slot)
 {
-    if (param0 == 12) {
+    if (slot == 12) {
         return 12;
     }
 
-    if (param0 < 6) {
-        return param0 + 6;
+    if (slot < 6) {
+        return slot + 6;
     }
 
-    return param0 - 6;
+    return slot - 6;
 }
 
-void sub_02095CFC(int param0, int param1, void *param2, void *param3)
+void sub_02095CFC(int param0, int param1, void *dest, void *param3)
 {
     FieldSystem *fieldSystem = (FieldSystem *)param3;
-    UnkStruct_02095E80 *v1 = fieldSystem->unk_88;
+    UnionTrade *unionTrade = fieldSystem->unk_88;
 
     if (param0 != CommSys_CurNetId()) {
-        memcpy((void *)v1->unk_2274, param2, (236 * 6 + 4 * 2));
-        v1->unk_58++;
+        memcpy((void *)unionTrade->friendParty, dest, (236 * 6 + 4 * 2));
+        unionTrade->unk_58++;
 
-        if ((v1->unk_58) * (236 * 6 + 4 * 2) >= Party_SaveSize()) {
+        if ((unionTrade->unk_58) * (236 * 6 + 4 * 2) >= Party_SaveSize()) {
             if (CommSys_CurNetId() == 1) {
-                ov88_0223D058(v1, 27, 0);
+                ov88_0223D058(unionTrade, 27, 0);
             } else {
-                ov88_0223D098(CommSys_CurNetId(), v1->unk_2270, v1->unk_50);
+                ov88_0223D098(CommSys_CurNetId(), unionTrade->playerParty, unionTrade->unk_50);
             }
         } else {
-            ov88_0223D098(CommSys_CurNetId(), v1->unk_2270, v1->unk_50);
+            ov88_0223D098(CommSys_CurNetId(), unionTrade->playerParty, unionTrade->unk_50);
         }
 
-        v1->unk_50++;
+        unionTrade->unk_50++;
     }
 }
 
-void sub_02095D74(int param0, int param1, void *param2, void *param3)
+void sub_02095D74(int param0, int param1, void *partySlot, void *param3)
 {
-    UnkStruct_02095E80 *v0 = ((FieldSystem *)param3)->unk_88;
-    u8 *v1 = (u8 *)param2;
+    UnionTrade *unionTrade = ((FieldSystem *)param3)->unk_88;
+    u8 *slot = (u8 *)partySlot;
 
     if (param0 != CommSys_CurNetId()) {
-        v0->unk_88[1] = sub_02095CE8(*v1);
+        unionTrade->selectedMonId[1] = sub_02095CE8(*slot);
     }
 }
 
 void sub_02095D94(int param0, int param1, void *param2, void *param3)
 {
-    UnkStruct_02095E80 *v0 = ((FieldSystem *)param3)->unk_88;
+    UnionTrade *v0 = ((FieldSystem *)param3)->unk_88;
     u8 *v1 = (u8 *)param2;
 
     v0->unk_60[param0] = *v1;
@@ -113,7 +113,7 @@ void sub_02095DA8(int param0, int param1, void *param2, void *param3)
 
 void sub_02095DAC(int param0, int param1, void *param2, void *param3)
 {
-    UnkStruct_02095E80 *v0 = ((FieldSystem *)param3)->unk_88;
+    UnionTrade *v0 = ((FieldSystem *)param3)->unk_88;
     v0->unk_54 = 2;
 }
 
@@ -124,7 +124,7 @@ void sub_02095DB8(int param0, int param1, void *param2, void *param3)
 
 void sub_02095DBC(int param0, int param1, void *param2, void *param3)
 {
-    UnkStruct_02095E80 *v0 = ((FieldSystem *)param3)->unk_88;
+    UnionTrade *v0 = ((FieldSystem *)param3)->unk_88;
     u8 *v1 = (u8 *)param2;
 
     v0->unk_2318 = *v1;
@@ -134,7 +134,7 @@ void sub_02095DCC(int param0, int param1, void *param2, void *param3)
 {
     FieldSystem *fieldSystem = (FieldSystem *)param3;
     int v1;
-    u8 *v2 = sub_0202D79C(fieldSystem->saveData);
+    u8 *v2 = GetRibbonData(fieldSystem->saveData);
     u8 *v3 = (u8 *)param2;
 
     if (CommSys_CurNetId() == param0) {
@@ -150,32 +150,33 @@ void sub_02095DCC(int param0, int param1, void *param2, void *param3)
     }
 }
 
-void sub_02095DFC(int param0, int param1, void *param2, void *param3)
+void sub_02095DFC(int param0, int param1, void *srcPalPad, void *param3)
 {
-    UnkStruct_02095E80 *v0 = ((FieldSystem *)param3)->unk_88;
+    UnionTrade *unionTrade = ((FieldSystem *)param3)->unk_88;
 
     if (CommSys_CurNetId() != param0) {
-        PalPad_PushEntries(v0->unk_227C, (PalPad *)param2, 1, HEAP_ID_26);
-        v0->unk_54 = 3;
+        PalPad_PushEntries(unionTrade->palPad, (PalPad *)srcPalPad, 1, HEAP_ID_26);
+        unionTrade->unk_54 = 3;
     }
 }
 
-void sub_02095E28(int param0, int param1, void *param2, void *param3)
+void sub_02095E28(int slot, int param1, void *srcChatotCry, void *param3)
 {
-    UnkStruct_02095E80 *v0 = ((FieldSystem *)param3)->unk_88;
+    UnionTrade *unionTrade = ((FieldSystem *)param3)->unk_88;
 
-    if (CommSys_CurNetId() != param0) {
-        MI_CpuCopyFast(param2, v0->unk_2E6C[param0], 1000);
-        v0->unk_54 = 4;
+    if (CommSys_CurNetId() != slot) {
+        MI_CpuCopyFast(srcChatotCry, unionTrade->chatotCry[slot], 1000);
+        unionTrade->unk_54 = 4;
         sub_0203632C(0);
     }
 }
 
-void sub_02095E60(FieldSystem *fieldSystem, UnkStruct_02095E80 *param1)
+void sub_02095E60(FieldSystem *fieldSystem, UnionTrade *unionTrade)
 {
-    fieldSystem->unk_88 = param1;
+    fieldSystem->unk_88 = unionTrade;
 }
 
+// why...
 static int sub_02095E68(void)
 {
     return 1000 + 4;
@@ -186,7 +187,7 @@ static int sub_02095E70(void)
     return 14;
 }
 
-static int sub_02095E74(void)
+static int GetPalPadTypeSize(void)
 {
     return sizeof(PalPad);
 }
@@ -198,6 +199,6 @@ static int sub_02095E78(void)
 
 static u8 *sub_02095E80(int param0, void *param1, int param2)
 {
-    UnkStruct_02095E80 *v0 = ((FieldSystem *)param1)->unk_88;
-    return (u8 *)v0->unk_234C[param0];
+    UnionTrade *unionTrade = ((FieldSystem *)param1)->unk_88;
+    return (u8 *)unionTrade->unk_234C[param0];
 }

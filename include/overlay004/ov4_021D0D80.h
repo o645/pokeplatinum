@@ -26,7 +26,7 @@ int ov4_021D1590(void *param0, int param1);
 void *ov4_021D1AA0(DWCAllocType param0, u32 param1, int param2);
 void ov4_021D1B04(DWCAllocType param0, void *param1, u32 param2);
 int ov4_021D1B5C(void);
-int ov4_021D1E30();
+int ov4_021D1E30_getNetId();
 void ov4_021D1E74(int heapID);
 void ov4_021D1F18(void);
 int NintendoWFC_GetErrorCode(int param0, int param1);

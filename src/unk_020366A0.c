@@ -40,7 +40,7 @@ typedef struct {
     int unk_40;
     u16 unk_44;
     u8 unk_46;
-    u8 unk_47;
+    u8 connectedCount;
     u8 unk_48;
     u8 unk_49;
     u8 unk_4A;
@@ -1743,7 +1743,7 @@ static void sub_02037ED8(void)
     }
 
     if (Unk_021C07D4->unk_4F) {
-        if (Unk_021C07D4->unk_47 != CommSys_ConnectedCount()) {
+        if (Unk_021C07D4->connectedCount != CommSys_ConnectedCount()) {
             sub_02036C94(sub_02037EB0, 0);
         }
     }
@@ -2349,9 +2349,9 @@ void CommMan_SetErrorHandling(BOOL param0, BOOL param1)
         Unk_021C07D4->unk_50 = param1;
 
         if (param0) {
-            Unk_021C07D4->unk_47 = CommSys_ConnectedCount();
+            Unk_021C07D4->connectedCount = CommSys_ConnectedCount();
         } else {
-            Unk_021C07D4->unk_47 = 0;
+            Unk_021C07D4->connectedCount = 0;
         }
     }
 
@@ -2609,7 +2609,7 @@ static BOOL sub_02038C74(int param0)
     }
 
     if (Unk_021C07D4->unk_4F) {
-        if (Unk_021C07D4->unk_47 != CommSys_ConnectedCount()) {
+        if (Unk_021C07D4->connectedCount != CommSys_ConnectedCount()) {
             sub_02036C94(sub_02037EB0, 0);
             v0 = 0;
         }

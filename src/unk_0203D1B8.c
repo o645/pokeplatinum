@@ -194,7 +194,7 @@ typedef struct {
 
 typedef struct {
     int unk_00;
-    UnkStruct_ov88_0223C370 unk_04;
+    UnkStruct_ov88_playerData playerData;
     TradeAnimationTemplate unk_48;
     EvolutionData *unk_60;
     int unk_64;
@@ -527,7 +527,7 @@ void *sub_0203D5C8(int param0, FieldSystem *fieldSystem, int param2)
     v0->monMax = Party_GetCurrentCount(v0->monData);
     v0->move = 0;
     v0->mode = SUMMARY_MODE_NORMAL;
-    v0->specialRibbons = sub_0202D79C(fieldSystem->saveData);
+    v0->specialRibbons = GetRibbonData(fieldSystem->saveData);
     v0->dexMode = SaveData_GetDexMode(fieldSystem->saveData);
     v0->showContest = PokemonSummaryScreen_ShowContestData(fieldSystem->saveData);
     v0->chatotCry = NULL;
@@ -570,7 +570,7 @@ PokemonSummary *sub_0203D670(FieldSystem *fieldSystem, int heapID, int mode)
     v0->mode = mode;
     v0->dexMode = SaveData_GetDexMode(saveData);
     v0->showContest = PokemonSummaryScreen_ShowContestData(saveData);
-    v0->specialRibbons = sub_0202D79C(saveData);
+    v0->specialRibbons = GetRibbonData(saveData);
 
     PokemonSummaryScreen_FlagVisiblePages(v0, v2);
     PokemonSummaryScreen_SetPlayerProfile(v0, SaveData_GetTrainerInfo(saveData));
@@ -934,40 +934,40 @@ static const ApplicationManagerTemplate Unk_020EA268 = {
     FS_OVERLAY_ID(overlay95)
 };
 
-static void sub_0203DB38(UnkStruct_ov88_0223C370 *param0, FieldSystem *fieldSystem)
+static void sub_0203DB38(UnkStruct_ov88_playerData *param0, FieldSystem *fieldSystem)
 {
-    param0->unk_04 = SaveData_GetTrainerInfo(fieldSystem->saveData);
-    param0->unk_08 = SaveData_GetParty(fieldSystem->saveData);
-    param0->unk_0C = SaveData_SaveTable(fieldSystem->saveData, SAVE_TABLE_ENTRY_PAL_PAD);
+    param0->trainerInfo = SaveData_GetTrainerInfo(fieldSystem->saveData);
+    param0->currentParty = SaveData_GetParty(fieldSystem->saveData);
+    param0->palPad = SaveData_SaveTable(fieldSystem->saveData, SAVE_TABLE_ENTRY_PAL_PAD);
     param0->wiFiHistory = SaveData_WiFiHistory(fieldSystem->saveData);
     param0->options = SaveData_GetOptions(fieldSystem->saveData);
-    param0->unk_24 = SaveData_GetPokedex(fieldSystem->saveData);
-    param0->unk_30 = SaveData_GetDexMode(fieldSystem->saveData);
+    param0->pokedex = SaveData_GetPokedex(fieldSystem->saveData);
+    param0->dexMode = SaveData_GetDexMode(fieldSystem->saveData);
     param0->saveData = fieldSystem->saveData;
-    param0->unk_1C = fieldSystem->journalEntry;
+    param0->journalEntry = fieldSystem->journalEntry;
     param0->records = SaveData_GetGameRecords(fieldSystem->saveData);
-    param0->unk_38 = Heap_Alloc(HEAP_ID_FIELD3, TrainerInfo_Size());
-    param0->unk_3C = Heap_Alloc(HEAP_ID_FIELD3, Pokemon_GetStructSize());
-    param0->unk_40 = Heap_Alloc(HEAP_ID_FIELD3, Pokemon_GetStructSize());
+    param0->friendTrainerInfo = Heap_Alloc(HEAP_ID_FIELD3, TrainerInfo_Size());
+    param0->sentPokemon = Heap_Alloc(HEAP_ID_FIELD3, Pokemon_GetStructSize());
+    param0->receivedPokemon = Heap_Alloc(HEAP_ID_FIELD3, Pokemon_GetStructSize());
     param0->fieldSystem = fieldSystem;
     param0->unk_34 = 0;
 }
 
-static void sub_0203DBC0(UnkStruct_ov88_0223C370 *param0)
+static void sub_0203DBC0(UnkStruct_ov88_playerData *param0)
 {
-    if (param0->unk_38) {
-        Heap_Free(param0->unk_38);
-        param0->unk_38 = NULL;
+    if (param0->friendTrainerInfo) {
+        Heap_Free(param0->friendTrainerInfo);
+        param0->friendTrainerInfo = NULL;
     }
 
-    if (param0->unk_3C) {
-        Heap_Free(param0->unk_3C);
-        param0->unk_3C = NULL;
+    if (param0->sentPokemon) {
+        Heap_Free(param0->sentPokemon);
+        param0->sentPokemon = NULL;
     }
 
-    if (param0->unk_40) {
-        Heap_Free(param0->unk_40);
-        param0->unk_40 = NULL;
+    if (param0->receivedPokemon) {
+        Heap_Free(param0->receivedPokemon);
+        param0->receivedPokemon = NULL;
     }
 }
 
@@ -986,15 +986,15 @@ BOOL sub_0203DBF0(FieldTask *param0)
         v2->unk_00++;
         break;
     case 1:
-        sub_0203DB38(&(v2->unk_04), fieldSystem);
+        sub_0203DB38(&(v2->playerData), fieldSystem);
         v2->unk_00++;
     case 2:
-        FieldTask_RunApplication(param0, &Unk_02100AA4, &v2->unk_04);
+        FieldTask_RunApplication(param0, &Unk_02100AA4, &v2->playerData);
         v2->unk_00++;
         break;
     case 3:
-        if (v2->unk_04.unk_28 == 0) {
-            sub_0203DBC0(&(v2->unk_04));
+        if (v2->playerData.unk_28 == 0) {
+            sub_0203DBC0(&(v2->playerData));
             Heap_Free(v2);
             return 1;
         }
@@ -1002,9 +1002,9 @@ BOOL sub_0203DBF0(FieldTask *param0)
         v2->unk_00++;
         break;
     case 4:
-        v2->unk_48.otherTrainer = v2->unk_04.unk_38;
-        v2->unk_48.sendingPokemon = Pokemon_GetBoxPokemon(v2->unk_04.unk_3C);
-        v2->unk_48.receivingPokemon = Pokemon_GetBoxPokemon(v2->unk_04.unk_40);
+        v2->unk_48.otherTrainer = v2->playerData.friendTrainerInfo;
+        v2->unk_48.sendingPokemon = Pokemon_GetBoxPokemon(v2->playerData.sentPokemon);
+        v2->unk_48.receivingPokemon = Pokemon_GetBoxPokemon(v2->playerData.receivedPokemon);
         v2->unk_48.options = SaveData_GetOptions(fieldSystem->saveData);
         v2->unk_48.tradeType = TRADE_TYPE_NORMAL;
 
@@ -1031,13 +1031,13 @@ BOOL sub_0203DBF0(FieldTask *param0)
         v2->unk_00 = 5;
         break;
     case 5: {
-        int v3 = Pokemon_GetValue(v2->unk_04.unk_40, MON_DATA_HELD_ITEM, NULL);
+        int v3 = Pokemon_GetValue(v2->playerData.receivedPokemon, MON_DATA_HELD_ITEM, NULL);
         int v4;
         int v5;
 
-        if ((v4 = Pokemon_GetEvolutionTargetSpecies(NULL, v2->unk_04.unk_40, EVO_CLASS_BY_TRADE, v3, &v5)) != 0) {
+        if ((v4 = Pokemon_GetEvolutionTargetSpecies(NULL, v2->playerData.receivedPokemon, EVO_CLASS_BY_TRADE, v3, &v5)) != 0) {
             Heap_Create(HEAP_ID_APPLICATION, HEAP_ID_26, 0x30000);
-            v2->unk_60 = Evolution_Begin(NULL, v2->unk_04.unk_40, v4, SaveData_GetOptions(fieldSystem->saveData), PokemonSummaryScreen_ShowContestData(fieldSystem->saveData), SaveData_GetPokedex(fieldSystem->saveData), SaveData_GetBag(fieldSystem->saveData), SaveData_GetGameRecords(fieldSystem->saveData), SaveData_GetPoketch(fieldSystem->saveData), v5, 0x4, HEAP_ID_26);
+            v2->unk_60 = Evolution_Begin(NULL, v2->playerData.receivedPokemon, v4, SaveData_GetOptions(fieldSystem->saveData), PokemonSummaryScreen_ShowContestData(fieldSystem->saveData), SaveData_GetPokedex(fieldSystem->saveData), SaveData_GetBag(fieldSystem->saveData), SaveData_GetGameRecords(fieldSystem->saveData), SaveData_GetPoketch(fieldSystem->saveData), v5, 0x4, HEAP_ID_26);
             v2->unk_00 = 6;
         } else {
             v2->unk_00 = 7;
@@ -1045,14 +1045,14 @@ BOOL sub_0203DBF0(FieldTask *param0)
     } break;
     case 6:
         if (Evolution_IsDone(v2->unk_60)) {
-            Pokemon_Copy(v2->unk_04.unk_40, Party_GetPokemonBySlotIndex(v2->unk_04.unk_08, v2->unk_04.unk_2C));
+            Pokemon_Copy(v2->playerData.receivedPokemon, Party_GetPokemonBySlotIndex(v2->playerData.currentParty, v2->playerData.playerSelectedSlot));
             sub_0207B0E0(v2->unk_60);
             Heap_Destroy(HEAP_ID_26);
             v2->unk_00 = 7;
         }
         break;
     case 7:
-        v2->unk_04.unk_34++;
+        v2->playerData.unk_34++;
         v2->unk_00 = 2;
 
         {
@@ -1373,7 +1373,7 @@ void *sub_0203E1AC(FieldSystem *fieldSystem, int param1, int param2)
     v0->options = SaveData_GetOptions(fieldSystem->saveData);
     v0->unk_14 = WiFiList_GetUserData(SaveData_GetWiFiList(fieldSystem->saveData));
     v0->saveData = fieldSystem->saveData;
-    v0->unk_1C = WiFiList_GetUserGsProfileId(SaveData_GetWiFiList(fieldSystem->saveData));
+    v0->userGsProfileId = WiFiList_GetUserGsProfileId(SaveData_GetWiFiList(fieldSystem->saveData));
     v0->unk_18 = param1;
     v0->unk_24 = param2;
     v0->unk_20 = 1;
@@ -1754,7 +1754,7 @@ void *FieldSystem_OpenSummaryScreenTeachMove(int unused, FieldSystem *fieldSyste
     summary->monMax = 1;
     summary->move = move;
     summary->mode = SUMMARY_MODE_SELECT_MOVE;
-    summary->specialRibbons = sub_0202D79C(fieldSystem->saveData);
+    summary->specialRibbons = GetRibbonData(fieldSystem->saveData);
     summary->dexMode = SaveData_GetDexMode(fieldSystem->saveData);
     summary->showContest = SystemFlag_CheckContestHallVisited(SaveData_GetVarsFlags(fieldSystem->saveData));
     summary->chatotCry = NULL;

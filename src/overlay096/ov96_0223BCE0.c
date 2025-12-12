@@ -608,7 +608,7 @@ static int ov96_0223C680(UnkStruct_ov96_0223BF40 *param0)
     s32 v0 = SystemData_GetDWCProfileId(param0->unk_00->unk_08);
 
     if (v0 == 0) {
-        SystemData_SetDWCProfileId(param0->unk_00->unk_08, param0->unk_00->unk_1C);
+        SystemData_SetDWCProfileId(param0->unk_00->unk_08, param0->unk_00->userGsProfileId);
     }
 
     v0 = SystemData_GetDWCProfileId(param0->unk_00->unk_08);

@@ -766,7 +766,7 @@ static u32 ov64_0222E09C(UnkStruct_ov64_0222E060 *param0, Strbuf *param1, Strbuf
     v5 = DWC_CreateFriendKey(WiFiList_GetUserData(v1));
 
     for (v0 = 0; v0 < 32; v0++) {
-        v2 = sub_0202AF78(v1, v0);
+        v2 = wifiSlotHasValidFriendData(v1, v0);
 
         if (v2 == 0) {
             v4 = Strbuf_AtoI(param1, &v3);
@@ -784,7 +784,7 @@ static u32 ov64_0222E09C(UnkStruct_ov64_0222E060 *param0, Strbuf *param1, Strbuf
                     return 2;
                 }
 
-                v6 = sub_0202AED8(v1, v0);
+                v6 = GetFriendDataById(v1, v0);
                 DWC_CreateFriendKeyToken(v6, v4);
 
                 sub_0202AF0C(v1, v0, param2);
@@ -824,7 +824,7 @@ static void ov64_0222E164(UnkStruct_ov64_0222E060 *param0)
     param0->unk_08.unk_00 = 0;
 
     for (v0 = 0; v0 < (8 * 4); v0++) {
-        if (sub_0202AF78(v1, v0) == 1) {
+        if (wifiSlotHasValidFriendData(v1, v0) == 1) {
             param0->unk_08.unk_04[param0->unk_08.unk_00] = v0;
             param0->unk_08.unk_00++;
         }
@@ -1106,7 +1106,7 @@ static void ov64_0222E880(UnkStruct_ov64_0222E21C *param0, SaveData *saveData, u
     WiFiList *v0 = SaveData_GetWiFiList(saveData);
     TrainerInfo *v1 = TrainerInfo_New(heapID);
 
-    TrainerInfo_SetName(v1, sub_0202AEF0(v0, param2));
+    TrainerInfo_SetName(v1, GetFriendTrainerName(v0, param2));
     StringTemplate_SetPlayerName(param0->unk_214, 0, v1);
     Heap_Free(v1);
 }
@@ -1551,7 +1551,7 @@ static BOOL ov64_0222F068(UnkStruct_ov64_0222F038 *param0, UnkStruct_ov64_0222E0
         v1 = SaveData_GetWiFiList(param1->saveData);
 
         for (v0 = 0; v0 < 32; v0++) {
-            if (!sub_0202AF78(v1, v0)) {
+            if (!wifiSlotHasValidFriendData(v1, v0)) {
                 return 1;
             }
         }
@@ -1657,7 +1657,7 @@ static int ov64_0222F0C4(UnkStruct_ov64_0222F0C4 *param0, UnkStruct_ov64_0222E06
         v2 = ov64_0222FF38(param0);
         v1 = SaveData_GetWiFiList(param1->saveData);
 
-        ov64_0222E158(param1, sub_0202AEF0(v1, param1->unk_08.unk_04[v2]));
+        ov64_0222E158(param1, GetFriendTrainerName(v1, param1->unk_08.unk_04[v2]));
         param1->unk_04 = 11;
         break;
     case 11:
@@ -2141,7 +2141,7 @@ static BOOL ov64_0222FBA4(UnkStruct_ov64_0222F0C4 *param0, UnkStruct_ov64_0222E0
 
     v0 = SaveData_GetWiFiList(param1->saveData);
     v3 = ov64_0222FF38(param0);
-    v1 = sub_0202AED8(v0, param1->unk_08.unk_04[v3]);
+    v1 = GetFriendDataById(v0, param1->unk_08.unk_04[v3]);
     v2 = DWC_GetFriendKey(v1);
 
     if (v2 != 0) {
@@ -2441,7 +2441,7 @@ static void ov64_022302EC(UnkStruct_ov64_02230074 *param0, UnkStruct_ov63_0222AE
     v5 = ((Unk_ov64_02232324[param4].unk_00.unk_02) * 8) + -24;
     v3 = Strbuf_Init(128, heapID);
 
-    Strbuf_CopyChars(v3, sub_0202AEF0(param5, param6));
+    Strbuf_CopyChars(v3, GetFriendTrainerName(param5, param6));
     Text_AddPrinterWithParamsAndColor(&param0->unk_08, FONT_SYSTEM, v3, v4, v5, TEXT_SPEED_NO_TRANSFER, v6[v0], NULL);
     Strbuf_Free(v3);
 }

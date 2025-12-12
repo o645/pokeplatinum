@@ -107,7 +107,7 @@ typedef struct {
     u8 unk_6AB;
     u8 unk_6AC;
     u8 unk_6AD;
-    u8 unk_6AE;
+    u8 isAlone;
     u8 wifiConnected;
     u8 unk_6B0;
     u8 unk_6B1;
@@ -1415,11 +1415,11 @@ static void CommSys_RecvDataSingle(CommRing *ring, int netId, u8 *buffer, CommRe
 {
     int size;
     u8 cmd;
-    int v2;
+    int startIndex;
     int v3;
 
     while (CommRing_DataSize(ring) != 0) {
-        v2 = ring->startIndex;
+        startIndex = ring->startIndex;
 
         if (param3->unk_0A != 0xee) {
             cmd = param3->unk_0A;
@@ -1431,7 +1431,7 @@ static void CommSys_RecvDataSingle(CommRing *ring, int netId, u8 *buffer, CommRe
             }
         }
 
-        v2 = ring->startIndex;
+        startIndex = ring->startIndex;
         param3->unk_0A = cmd;
 
         if (param3->unk_08 != 0xffff) {
@@ -1445,13 +1445,13 @@ static void CommSys_RecvDataSingle(CommRing *ring, int netId, u8 *buffer, CommRe
 
             if (0xffff == size) {
                 if (CommRing_DataSize(ring) < 1) {
-                    ring->startIndex = v2;
+                    ring->startIndex = startIndex;
                     break;
                 }
 
                 size = CommRing_ReadByte(ring) * 0x100;
                 size += CommRing_ReadByte(ring);
-                v2 = ring->startIndex;
+                startIndex = ring->startIndex;
             }
 
             param3->unk_08 = size;
@@ -1486,7 +1486,7 @@ static void CommSys_RecvDataSingle(CommRing *ring, int netId, u8 *buffer, CommRe
                     break;
                 }
             } else {
-                ring->startIndex = v2;
+                ring->startIndex = startIndex;
                 break;
             }
         }
@@ -1732,7 +1732,7 @@ u16 CommSys_CurNetId(void)
 {
     if (sCommunicationSystem) {
         if (CommLocal_IsWifiGroup(sub_0203895C())) {
-            int netId = ov4_021D1E30();
+            int netId = ov4_021D1E30_getNetId();
 
             if (netId != -1) {
                 return netId;
@@ -1796,20 +1796,20 @@ int CommType_MaxPlayers(int param0)
 
 int CommType_MinPlayers(int param0)
 {
-    return sub_02032698(param0) + 1;
+    return GetMinPlayers(param0) + 1;
 }
 
-void CommSys_SetAlone(BOOL param0)
+void CommSys_SetAlone(BOOL isAlone)
 {
     if (sCommunicationSystem) {
-        sCommunicationSystem->unk_6AE = param0;
+        sCommunicationSystem->isAlone = isAlone;
     }
 }
 
 BOOL CommSys_IsAlone(void)
 {
     if (sCommunicationSystem) {
-        return sCommunicationSystem->unk_6AE;
+        return sCommunicationSystem->isAlone;
     }
 
     return FALSE;
