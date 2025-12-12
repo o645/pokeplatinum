@@ -17,7 +17,7 @@
 
 int TVBroadcast_SaveSize(void);
 void TVBroadcast_Init(TVBroadcast *broadcast);
-void sub_0202E2EC(TVBroadcast *broadcast);
+void TVBoardcast_Clear(TVBroadcast *broadcast);
 void TVBroadcast_UpdateProgramTimeSlot(TVBroadcast *broadcast, int deltaMinutes, int currentMinute);
 void TVBroadcast_ClearWatchProgress(TVBroadcast *broadcast);
 void TVBroadcast_SetProgramFinished(TVBroadcast *broadcast, BOOL finished);

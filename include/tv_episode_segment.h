@@ -12,8 +12,8 @@
 #include "string_template.h"
 #include "trainer_info.h"
 
-int TVEpisodeSegment_LoadMessage(int programTypeID, FieldSystem *fieldSystem, StringTemplate *template, UnkStruct_ov6_022465F4 *param3, u16 *bankDestVar);
-BOOL TVEpisodeSegment_IsEligible(int programTypeID, FieldSystem *fieldSystem, UnkStruct_ov6_022465F4 *param2);
+int TVEpisodeSegment_LoadMessage(int programTypeID, FieldSystem *fieldSystem, StringTemplate *template, TvSegmentData *param3, u16 *bankDestVar);
+BOOL TVEpisodeSegment_IsEligible(int programTypeID, FieldSystem *fieldSystem, TvSegmentData *param2);
 void sub_0206CF14(TVBroadcast *broadcast, Pokemon *param1, int param2, int param3, int param4);
 void sub_0206CF48(TVBroadcast *broadcast, Pokemon *param1, int heapID);
 void FieldSystem_SaveTVEpisodeSegment_PlantingAndWateringShow(FieldSystem *fieldSystem, u16 berryItemID, u8 yieldRating, u16 yieldAmount);

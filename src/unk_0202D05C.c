@@ -382,7 +382,7 @@ Sentence *sub_0202D498(SaveData *saveData, int param1)
     return &(frontier->unk_950.unk_168.unk_00[param1]);
 }
 
-void sub_0202D4B0(UnkStruct_0202D764 *param0, u8 param1, u8 param2, RTCDate *param3)
+void sub_0202D4B0(UnkStruct_0202D764 *param0, u8 param1, u8 param2, RTCDate *date)
 {
     u8 v0, v1;
     u8 v2 = 1;
@@ -403,7 +403,7 @@ void sub_0202D4B0(UnkStruct_0202D764 *param0, u8 param1, u8 param2, RTCDate *par
     v2 <<= v1;
 
     param0->unk_04[v0] |= v2;
-    param0->unk_00 = Date_Encode(param3);
+    param0->unk_00 = Date_Encode(date);
 }
 
 void sub_0202D514(UnkStruct_0202D764 *param0)
@@ -412,17 +412,17 @@ void sub_0202D514(UnkStruct_0202D764 *param0)
     MI_CpuClear8(&param0->unk_00, sizeof(u32));
 }
 
-static BOOL sub_0202D530(RTCDate *param0, RTCDate *param1)
+static BOOL sub_0202D530(RTCDate *date1, RTCDate *date2)
 {
-    if (param0->year > param1->year) {
+    if (date1->year > date2->year) {
         return 1;
     }
 
-    if (param0->month > param1->month) {
+    if (date1->month > date2->month) {
         return 1;
     }
 
-    if (param0->day > param1->day) {
+    if (date1->day > date2->day) {
         return 1;
     }
 
@@ -485,28 +485,29 @@ void sub_0202D628(UnkStruct_0202D764 *param0, UnkStruct_02049A68 *param1)
     param1->unk_04 = param0->unk_100;
 }
 
-void sub_0202D63C(UnkStruct_0202D764 *param0, FrontierDataDTO *param1, const u8 param2)
+void sub_0202D63C(UnkStruct_0202D764 *param0, FrontierDataDTO *frontierData, const u8 param2)
 {
-    FrontierTrainerDataDTO *v0 = &(param1->trDataDTO);
-    FrontierPokemonDataDTO *v1 = param1->monDataDTO;
+    FrontierTrainerDataDTO *frontierTrainerData = &(frontierData->trDataDTO);
+    FrontierPokemonDataDTO *frontierMonData = frontierData->monDataDTO;
     UnkStruct_0202D63C *v2 = &(param0->unk_104[param2]);
 
-    v0->trainerID = 10000;
-    v0->trainerType = v2->unk_C9;
+    frontierTrainerData->trainerID = 10000;
+    frontierTrainerData->trainerType = v2->trainerType;
 
     if (v2->unk_C8_val1_unk_00_0) {
-        MessageLoader *v3 = MessageLoader_Init(MSG_LOADER_PRELOAD_ENTIRE_BANK, NARC_INDEX_MSGDATA__PL_MSG, TEXT_BANK_UNK_0022, HEAP_ID_FIELD2);
+        MessageLoader *frontierMessages = MessageLoader_Init(MSG_LOADER_PRELOAD_ENTIRE_BANK, NARC_INDEX_MSGDATA__PL_MSG, TEXT_BANK_UNK_0022, HEAP_ID_FIELD2);
 
-        MessageLoader_Get(v3, 22 + v2->unk_C8_val1_unk_00_1, v0->trainerName);
-        MessageLoader_Free(v3);
+        //"Plato"
+        MessageLoader_Get(frontierMessages, 22 + v2->unk_C8_val1_unk_00_1, frontierTrainerData->trainerName);
+        MessageLoader_Free(frontierMessages);
     } else {
-        MI_CpuCopy8(v2->unk_A8, v0->trainerName, 16);
+        MI_CpuCopy8(v2->unk_A8, frontierTrainerData->trainerName, 16);
     }
 
-    MI_CpuCopy8(v2->unk_CA, v0->unk_18, 8);
-    MI_CpuCopy8(v2->unk_D2, v0->unk_20, 8);
-    MI_CpuCopy8(v2->unk_DA, v0->unk_28, 8);
-    MI_CpuCopy8(v2->unk_00, v1, sizeof(FrontierPokemonDataDTO) * 3);
+    MI_CpuCopy8(v2->unk_CA, frontierTrainerData->unk_18, 8);
+    MI_CpuCopy8(v2->unk_D2, frontierTrainerData->unk_20, 8);
+    MI_CpuCopy8(v2->unk_DA, frontierTrainerData->unk_28, 8);
+    MI_CpuCopy8(v2->unk_00, frontierMonData, sizeof(FrontierPokemonDataDTO) * 3);
 }
 
 void sub_0202D6DC(UnkStruct_0202D764 *param0, UnkStruct_ov96_0223B450_sub2 *param1, u8 param2, u8 param3)

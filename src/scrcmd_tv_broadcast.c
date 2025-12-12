@@ -53,50 +53,50 @@ static int TVInterview_LoadMessage(int param0, FieldSystem *fieldSystem, StringT
 static void TVInterview_SaveResponse(FieldSystem *fieldSystem, int segmentID, u16 customMessageWord, u16 unused);
 static BOOL TVInterview_IsEligible(FieldSystem *fieldSystem, int param1);
 
-BOOL ScrCmd_CallTVBroadcast(ScriptContext *param0)
+BOOL ScrCmd_CallTVBroadcast(ScriptContext *scriptContext)
 {
-    switch (ScriptContext_ReadHalfWord(param0)) {
+    switch (ScriptContext_ReadHalfWord(scriptContext)) {
     case TV_BROADCAST_CALL_CHECK_STATUS: {
-        u16 *statusDestVar = ScriptContext_GetVarPointer(param0);
+        u16 *statusDestVar = ScriptContext_GetVarPointer(scriptContext);
 
-        *statusDestVar = TVBroadcast_GetPendingBroadcastType(param0->fieldSystem);
+        *statusDestVar = TVBroadcast_GetPendingBroadcastType(scriptContext->fieldSystem);
     } break;
     case TV_BROADCAST_CALL_LOAD_FRAMING_MESSAGE: {
-        u16 framingMessageType = ScriptContext_ReadHalfWord(param0);
-        u16 *bankDestVar = ScriptContext_GetVarPointer(param0);
-        u16 *messageDestVar = ScriptContext_GetVarPointer(param0);
+        u16 framingMessageType = ScriptContext_ReadHalfWord(scriptContext);
+        u16 *bankDestVar = ScriptContext_GetVarPointer(scriptContext);
+        u16 *messageDestVar = ScriptContext_GetVarPointer(scriptContext);
 
         *bankDestVar = TEXT_BANK_TV_PROGRAMS;
-        *messageDestVar = TVBroadcast_GetProgramFramingMessage(param0->fieldSystem, framingMessageType);
+        *messageDestVar = TVBroadcast_GetProgramFramingMessage(scriptContext->fieldSystem, framingMessageType);
     } break;
     case TV_BROADCAST_CALL_LOAD_SEGMENT: {
-        StringTemplate **template = FieldSystem_GetScriptMemberPtr(param0->fieldSystem, SCRIPT_MANAGER_STR_TEMPLATE);
-        u16 segmentID = ScriptContext_GetVar(param0);
-        u16 *bankDestVar = ScriptContext_GetVarPointer(param0);
-        u16 *messageDestVar = ScriptContext_GetVarPointer(param0);
+        StringTemplate **template = FieldSystem_GetScriptMemberPtr(scriptContext->fieldSystem, SCRIPT_MANAGER_STR_TEMPLATE);
+        u16 segmentID = ScriptContext_GetVar(scriptContext);
+        u16 *bankDestVar = ScriptContext_GetVarPointer(scriptContext);
+        u16 *messageDestVar = ScriptContext_GetVarPointer(scriptContext);
 
-        TVBroadcast_LoadSegmentMessage(param0->fieldSystem, *template, segmentID, bankDestVar, messageDestVar);
+        TVBroadcast_LoadSegmentMessage(scriptContext->fieldSystem, *template, segmentID, bankDestVar, messageDestVar);
     } break;
     case TV_BROADCAST_CALL_FINISH_PROGRAM:
-        FieldSystem_SetTVProgramFinished(param0->fieldSystem);
+        FieldSystem_SetTVProgramFinished(scriptContext->fieldSystem);
         break;
     case TV_BROADCAST_CALL_LOAD_COMMERCIAL: {
-        u16 *bankDestVar = ScriptContext_GetVarPointer(param0);
-        u16 *messageDestVar = ScriptContext_GetVarPointer(param0);
+        u16 *bankDestVar = ScriptContext_GetVarPointer(scriptContext);
+        u16 *messageDestVar = ScriptContext_GetVarPointer(scriptContext);
 
         *bankDestVar = TEXT_BANK_TV_COMMERCIALS;
-        *messageDestVar = ov6_02246B40(param0->fieldSystem);
+        *messageDestVar = ov6_02246B40(scriptContext->fieldSystem);
     } break;
     case TV_BROADCAST_CALL_UNUSED: {
-        u16 v10 = ScriptContext_GetVar(param0);
-        u16 v11 = ScriptContext_GetVar(param0);
-        u16 *v12 = ScriptContext_GetVarPointer(param0);
+        u16 v10 = ScriptContext_GetVar(scriptContext);
+        u16 v11 = ScriptContext_GetVar(scriptContext);
+        u16 *v12 = ScriptContext_GetVarPointer(scriptContext);
 
-        *v12 = ov6_022468B0(param0->fieldSystem, v10, v11);
+        *v12 = ov6_022468B0(scriptContext->fieldSystem, v10, v11);
     } break;
     case TV_BROADCAST_CALL_GET_NEXT_SEGMENT_ID: {
-        u16 *segmentDestVar = ScriptContext_GetVarPointer(param0);
-        *segmentDestVar = ov6_02246920(param0->fieldSystem);
+        u16 *segmentDestVar = ScriptContext_GetVarPointer(scriptContext);
+        *segmentDestVar = ov6_02246920(scriptContext->fieldSystem);
     } break;
     }
 
@@ -109,12 +109,12 @@ BOOL ScrCmd_236(ScriptContext *param0)
     return 0;
 }
 
-BOOL ScrCmd_2B8(ScriptContext *param0)
+BOOL ScrCmd_2B8(ScriptContext *scriptContext)
 {
-    Party *v0 = SaveData_GetParty(param0->fieldSystem->saveData);
-    Pokemon *v1 = Party_GetPokemonBySlotIndex(v0, ScriptContext_GetVar(param0));
+    Party *party = SaveData_GetParty(scriptContext->fieldSystem->saveData);
+    Pokemon *pokemon = Party_GetPokemonBySlotIndex(party, ScriptContext_GetVar(scriptContext));
 
-    FieldSystem_SaveTVEpisodeSegment_RateThatNameChange(param0->fieldSystem, v1);
+    FieldSystem_SaveTVEpisodeSegment_RateThatNameChange(scriptContext->fieldSystem, pokemon);
     return 0;
 }
 

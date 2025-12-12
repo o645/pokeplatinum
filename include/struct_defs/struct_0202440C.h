@@ -21,9 +21,9 @@ typedef struct TVBroadcast {
     u8 playedSegments[TV_BROADCAST_MAX_PLAYED_SEGMENTS];
     int timeSlotMinutesRemaining;
     u8 programFinished;
-    UnkStruct_0202E768 unk_0C[4];
-    UnkStruct_0202E768 unk_C4[4];
-    UnkStruct_0202E768 unk_17C[4];
+    UnkStruct_0202E768 trainerSighting[4];
+    UnkStruct_0202E768 record[4];
+    UnkStruct_0202E768 interviewData[4];
     UnkStruct_0202E794 unk_234[16];
     UnkStruct_0202E794 unk_684[8];
     UnkStruct_0202E794 unk_8AC[8];

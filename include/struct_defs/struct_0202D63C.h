@@ -20,7 +20,7 @@ typedef struct UnkStruct_0202D63C_t {
         };
         u8 unk_C8_val2;
     };
-    u8 unk_C9;
+    u8 trainerType;
     u16 unk_CA[4];
     u16 unk_D2[4];
     u16 unk_DA[4];

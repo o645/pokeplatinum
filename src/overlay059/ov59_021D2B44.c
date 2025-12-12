@@ -177,7 +177,7 @@ UnkStruct_0202E794 *ov59_021D2C28(SaveData *saveData, int heapID, u32 param2)
     TVBroadcast *broadcast = SaveData_GetTVBroadcast(saveData);
 
     GF_ASSERT(param2 == ov59_021D2B44(saveData));
-    ov59_021D2B90(saveData, v0, broadcast->unk_17C, 4, 1, 3);
+    ov59_021D2B90(saveData, v0, broadcast->interview, 4, 1, 3);
 
     return v0;
 }
@@ -188,7 +188,7 @@ UnkStruct_0202E794 *ov59_021D2C70(SaveData *saveData, int heapID, u32 param2)
     TVBroadcast *broadcast = SaveData_GetTVBroadcast(saveData);
 
     GF_ASSERT(param2 == ov59_021D2B4C(saveData));
-    ov59_021D2B90(saveData, v0, broadcast->unk_0C, 4, 1, 4);
+    ov59_021D2B90(saveData, v0, broadcast->trainerSighting, 4, 1, 4);
 
     return v0;
 }
@@ -199,7 +199,7 @@ UnkStruct_0202E794 *ov59_021D2CB4(SaveData *saveData, int heapID, u32 param2)
     TVBroadcast *broadcast = SaveData_GetTVBroadcast(saveData);
 
     GF_ASSERT(param2 == ov59_021D2B54(saveData));
-    ov59_021D2B90(saveData, v0, broadcast->unk_C4, 4, 1, 5);
+    ov59_021D2B90(saveData, v0, broadcast->record, 4, 1, 5);
 
     return v0;
 }
@@ -210,7 +210,7 @@ UnkStruct_0202E794 *ov59_021D2CF8(SaveData *saveData, int heapID, u32 param2)
     TVBroadcast *broadcast = SaveData_GetTVBroadcast(saveData);
 
     GF_ASSERT(param2 == ov59_021D2B44(saveData));
-    ov59_021D2B90(saveData, v0, broadcast->unk_17C, 4, 0, 0);
+    ov59_021D2B90(saveData, v0, broadcast->interview, 4, 0, 0);
 
     return v0;
 }
@@ -221,7 +221,7 @@ UnkStruct_0202E794 *ov59_021D2D3C(SaveData *saveData, int heapID, u32 param2)
     TVBroadcast *broadcast = SaveData_GetTVBroadcast(saveData);
 
     GF_ASSERT(param2 == ov59_021D2B4C(saveData));
-    ov59_021D2B90(saveData, v0, broadcast->unk_0C, 4, 0, 1);
+    ov59_021D2B90(saveData, v0, broadcast->trainerSighting, 4, 0, 1);
 
     return v0;
 }
@@ -232,7 +232,7 @@ UnkStruct_0202E794 *ov59_021D2D80(SaveData *saveData, int heapID, u32 param2)
     TVBroadcast *broadcast = SaveData_GetTVBroadcast(saveData);
 
     GF_ASSERT(param2 == ov59_021D2B54(saveData));
-    ov59_021D2B90(saveData, v0, broadcast->unk_C4, 4, 0, 2);
+    ov59_021D2B90(saveData, v0, broadcast->record, 4, 0, 2);
 
     return v0;
 }

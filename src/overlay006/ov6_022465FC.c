@@ -239,10 +239,10 @@ static int TVBroadcast_RandomPendingSegment(FieldSystem *fieldSystem, const u8 *
     return squashedPendingSegmentIDs[MTRNG_Next() % pendingCount];
 }
 
-static int ov6_0224678C(TVBroadcast *broadcast, int programType, int param2, BOOL param3, BOOL param4, u8 *param5)
+static int ov6_0224678C(TVBroadcast *broadcast, int programType, int segmentId, BOOL param3, BOOL param4, u8 *loadedPendingSegments)
 {
     if ((programType != TV_PROGRAM_TYPE_SINNOH_NOW) && (programType != TV_PROGRAM_TYPE_VARIETY_HOUR)) {
-        return sub_0202E614(broadcast, programType, param2, param3, param4, param5);
+        return sub_0202E614(broadcast, programType, segmentId, param3, param4, loadedPendingSegments);
     }
 
     if (param4) {
@@ -253,8 +253,8 @@ static int ov6_0224678C(TVBroadcast *broadcast, int programType, int param2, BOO
         return 0;
     }
 
-    if (TVBroadcast_IsPlayedSegment(broadcast, param2) == FALSE) {
-        param5[0] = param2;
+    if (TVBroadcast_IsPlayedSegment(broadcast, segmentId) == FALSE) {
+        loadedPendingSegments[0] = segmentId;
         return 1;
     }
 
@@ -287,7 +287,7 @@ static int TVBroadcast_GetPendingEpisodeSegments(int programType, FieldSystem *f
 static void ov6_02246844(FieldSystem *fieldSystem, int programType, u8 *pendingSegmentIDs)
 {
     int segmentIndex;
-    UnkStruct_ov6_022465F4 *v1;
+    TvSegmentData *v1;
 
     for (segmentIndex = 0; *pendingSegmentIDs != NULL && segmentIndex < TV_BROADCAST_MAX_UNFILTERED_PENDING_SEGMENTS; pendingSegmentIDs++, segmentIndex++) {
         v1 = ov6_022465A0(fieldSystem, programType, *pendingSegmentIDs);
@@ -296,7 +296,7 @@ static void ov6_02246844(FieldSystem *fieldSystem, int programType, u8 *pendingS
             *pendingSegmentIDs = NULL;
         }
 
-        ov6_022465F4(v1);
+        ov6_FreeTvSegment(v1);
     }
 }
 
@@ -410,7 +410,7 @@ BOOL TVBroadcast_LoadSegmentMessage(FieldSystem *fieldSystem, StringTemplate *te
     int programID = TVBroadcast_GetScheduledProgramID(fieldSystem);
     int programType = TVBroadcast_GetProgramType(programID);
     TVBroadcast *broadcast = SaveData_GetTVBroadcast(fieldSystem->saveData);
-    UnkStruct_ov6_022465F4 *segment;
+    TvSegmentData *segment;
 
     TVBroadcast_SetPlayedSegment(broadcast, segmentID);
 
@@ -418,7 +418,7 @@ BOOL TVBroadcast_LoadSegmentMessage(FieldSystem *fieldSystem, StringTemplate *te
 
     ov6_0224647C(segment);
     *messageDestVar = TVEpisodeSegment_LoadMessage(programType, fieldSystem, template, segment, bankDestVar);
-    ov6_022465F4(segment);
+    ov6_FreeTvSegment(segment);
 
     return TRUE;
 }

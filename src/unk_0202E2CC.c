@@ -37,11 +37,11 @@ void TVBroadcast_Init(TVBroadcast *broadcast)
     SaveData_SetChecksum(SAVE_TABLE_ENTRY_TV_BROADCAST);
 }
 
-void sub_0202E2EC(TVBroadcast *broadcast)
+void TVBoardcast_Clear(TVBroadcast *broadcast)
 {
-    MI_CpuClearFast(broadcast->unk_0C, sizeof(UnkStruct_0202E768) * 4);
-    MI_CpuClearFast(broadcast->unk_C4, sizeof(UnkStruct_0202E768) * 4);
-    MI_CpuClearFast(broadcast->unk_17C, sizeof(UnkStruct_0202E768) * 4);
+    MI_CpuClearFast(broadcast->trainerSighting, sizeof(UnkStruct_0202E768) * 4);
+    MI_CpuClearFast(broadcast->record, sizeof(UnkStruct_0202E768) * 4);
+    MI_CpuClearFast(broadcast->interviewData, sizeof(UnkStruct_0202E768) * 4);
 
     TVBroadcast_ClearWatchProgress(broadcast);
     SaveData_SetChecksum(SAVE_TABLE_ENTRY_TV_BROADCAST);
@@ -144,11 +144,11 @@ int TVBroadcast_CountPlayedSegments(const TVBroadcast *broadcast)
 
 static void sub_0202E3F4(UnkStruct_0202E4D4 *param0, int param1, const u8 *param2)
 {
-    RTCDate v0;
+    RTCDate date;
 
-    GetCurrentDate(&v0);
+    GetCurrentDate(&date);
 
-    param0->unk_04 = Date_Encode(&v0);
+    param0->date = Date_Encode(&date);
     param0->unk_00 = param1;
     param0->unk_01 = 0;
 
@@ -156,15 +156,15 @@ static void sub_0202E3F4(UnkStruct_0202E4D4 *param0, int param1, const u8 *param
     SaveData_SetChecksum(SAVE_TABLE_ENTRY_TV_BROADCAST);
 }
 
-BOOL TVBroadcast_SaveSegmentData(TVBroadcast *broadcast, int param1, int param2, const u8 *param3)
+BOOL TVBroadcast_SaveSegmentData(TVBroadcast *broadcast, int programTypeId, int segmentId, const u8 *segment)
 {
     int i;
-    UnkStruct_0202E768 *v1 = sub_0202E4DC(broadcast, param1);
+    UnkStruct_0202E768 *v1 = sub_0202E4DC(broadcast, programTypeId);
 
     for (i = 0; i < 4; i++) {
-        if (v1[i].unk_00.unk_00 == param2) {
+        if (v1[i].unk_00.unk_00 == segmentId) {
             if (v1[i].unk_00.unk_01 >= 3) {
-                sub_0202E3F4(&v1[i].unk_00, param2, param3);
+                sub_0202E3F4(&v1[i].unk_00, segmentId, segment);
                 return 1;
             }
 
@@ -174,14 +174,14 @@ BOOL TVBroadcast_SaveSegmentData(TVBroadcast *broadcast, int param1, int param2,
 
     for (i = 0; i < 4; i++) {
         if (v1[i].unk_00.unk_00 == 0) {
-            sub_0202E3F4(&v1[i].unk_00, param2, param3);
+            sub_0202E3F4(&v1[i].unk_00, segmentId, segment);
             return 1;
         }
     }
 
     for (i = 0; i < 4; i++) {
         if (v1[i].unk_00.unk_01 >= 3) {
-            sub_0202E3F4(&v1[i].unk_00, param2, param3);
+            sub_0202E3F4(&v1[i].unk_00, segmentId, segment);
             return 1;
         }
     }
@@ -216,48 +216,48 @@ UnkStruct_0202E4D4 *sub_0202E4D8(UnkStruct_0202E768 *param0)
     return &param0->unk_00;
 }
 
-static UnkStruct_0202E768 *sub_0202E4DC(TVBroadcast *broadcast, int param1)
+static UnkStruct_0202E768 *sub_0202E4DC(TVBroadcast *broadcast, int programType)
 {
-    UnkStruct_0202E768 *v0 = NULL;
+    UnkStruct_0202E768 *res = NULL;
 
-    switch (param1) {
-    case 1:
-        v0 = broadcast->unk_17C;
+    switch (programType) {
+    case TV_PROGRAM_TYPE_INTERVIEWS:
+        res = broadcast->interviewData;
         break;
-    case 2:
-        v0 = broadcast->unk_0C;
+    case TV_PROGRAM_TYPE_TRAINER_SIGHTINGS:
+        res = broadcast->trainerSighting;
         break;
-    case 3:
-        v0 = broadcast->unk_C4;
+    case TV_PROGRAM_TYPE_RECORDS:
+        res = broadcast->record;
         break;
-    case 4:
-    case 5:
+    case TV_PROGRAM_TYPE_SINNOH_NOW:
+    case TV_PROGRAM_TYPE_VARIETY_HOUR:
         GF_ASSERT(0);
     }
 
-    return v0;
+    return res;
 }
 
-static UnkStruct_0202E794 *sub_0202E518(TVBroadcast *broadcast, int param1)
+static UnkStruct_0202E794 *sub_0202E518(TVBroadcast *broadcast, int programType)
 {
-    UnkStruct_0202E794 *v0 = NULL;
+    UnkStruct_0202E794 *res = NULL;
 
-    switch (param1) {
+    switch (programType) {
     case 2:
-        v0 = broadcast->unk_234;
+        res = broadcast->unk_234;
         break;
     case 3:
-        v0 = broadcast->unk_684;
+        res = broadcast->unk_684;
         break;
     case 1:
-        v0 = broadcast->unk_8AC;
+        res = broadcast->unk_8AC;
         break;
     case 4:
     case 5:
         GF_ASSERT(0);
     }
 
-    return v0;
+    return res;
 }
 
 int sub_0202E55C(const UnkStruct_0202E4D4 *param0)
@@ -279,25 +279,25 @@ void *sub_0202E574(UnkStruct_0202E4D4 *param0)
     return param0->unk_08;
 }
 
-static int sub_0202E578(const UnkStruct_0202E768 *param0, int param1, int param2, BOOL param3, u8 *param4)
+static int sub_0202E578(const UnkStruct_0202E768 *segmentData, int param1, int param2, BOOL param3, u8 *param4)
 {
-    int v0, v1;
+    int i, count;
 
-    for (v1 = 0, v0 = 0; v0 < param1; v0++) {
-        if (param0[v0].unk_00.unk_00 == param2) {
-            int v2 = param0[v0].unk_00.unk_01;
+    for (count = 0, i = 0; i < param1; i++) {
+        if (segmentData[i].unk_00.unk_00 == param2) {
+            int v2 = segmentData[i].unk_00.unk_01;
 
             if (param3 && v2) {
-                param4[v1] = v0 + 1;
-                v1++;
+                param4[count] = i + 1;
+                count++;
             } else if (!param3 && (v2 == 0)) {
-                param4[v1] = v0 + 1;
-                v1++;
+                param4[count] = i + 1;
+                count++;
             }
         }
     }
 
-    return v1;
+    return count;
 }
 
 static int sub_0202E5B8(const UnkStruct_0202E794 *param0, int param1, int param2, BOOL param3, u8 *param4)
@@ -321,26 +321,26 @@ static int sub_0202E5B8(const UnkStruct_0202E794 *param0, int param1, int param2
     return v1;
 }
 
-int sub_0202E614(const TVBroadcast *broadcast, int param1, int param2, BOOL param3, BOOL param4, u8 *param5)
+int sub_0202E614(const TVBroadcast *broadcast, int programType, int segmentId, BOOL param3, BOOL param4, u8 *loadedPendingSegments)
 {
-    switch (param1) {
+    switch (programType) {
     case 2:
         if (param3) {
-            return sub_0202E578(broadcast->unk_0C, 4, param2, param4, param5);
+            return sub_0202E578(broadcast->trainerSighting, 4, segmentId, param4, loadedPendingSegments);
         } else {
-            return sub_0202E5B8(broadcast->unk_234, 16, param2, param4, param5);
+            return sub_0202E5B8(broadcast->unk_234, 16, segmentId, param4, loadedPendingSegments);
         }
     case 3:
         if (param3) {
-            return sub_0202E578(broadcast->unk_C4, 4, param2, param4, param5);
+            return sub_0202E578(broadcast->record, 4, segmentId, param4, loadedPendingSegments);
         } else {
-            return sub_0202E5B8(broadcast->unk_684, 8, param2, param4, param5);
+            return sub_0202E5B8(broadcast->unk_684, 8, segmentId, param4, loadedPendingSegments);
         }
     case 1:
         if (param3) {
-            return sub_0202E578(broadcast->unk_17C, 4, param2, param4, param5);
+            return sub_0202E578(broadcast->interviewData, 4, segmentId, param4, loadedPendingSegments);
         } else {
-            return sub_0202E5B8(broadcast->unk_8AC, 8, param2, param4, param5);
+            return sub_0202E5B8(broadcast->unk_8AC, 8, segmentId, param4, loadedPendingSegments);
         }
     case 4:
         return 0;
@@ -403,14 +403,14 @@ UnkStruct_0202E768 *sub_0202E768(TVBroadcast *broadcast, int param1, int param2)
     return &v0[param2 - 1];
 }
 
-UnkStruct_0202E794 *sub_0202E794(TVBroadcast *broadcast, int param1, int param2)
+UnkStruct_0202E794 *sub_0202E794(TVBroadcast *broadcast, int programType, int param2)
 {
     UnkStruct_0202E794 *v0;
 
     GF_ASSERT(sub_0202E7C0(param2) == 0);
 
     param2 &= ~0x80;
-    v0 = sub_0202E518(broadcast, param1);
+    v0 = sub_0202E518(broadcast, programType);
 
     return &v0[param2 - 1];
 }
