@@ -9,7 +9,7 @@ typedef struct {
     u8 form;
     u16 gender;
     u16 formValue;
-    int ballCapsuleId;
-} ov88_TradePokemon;
+    int hasBallCapsule;
+} Trade_PokemonData;
 
 #endif // POKEPLATINUM_STRUCT_OV88_0223C8AC_H

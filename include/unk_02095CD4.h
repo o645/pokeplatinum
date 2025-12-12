@@ -14,6 +14,6 @@ void sub_02095DA8(int param0, int param1, void *param2, void *param3);
 void sub_02095DAC(int param0, int param1, void *param2, void *param3);
 void sub_02095DB8(int param0, int param1, void *param2, void *param3);
 void sub_02095DFC(int param0, int param1, void *param2, void *param3);
-void sub_02095E60(FieldSystem *fieldSystem, UnionTrade *unionTrade);
+void sub_02095E60(FieldSystem *fieldSystem, Trade *unionTrade);
 
 #endif // POKEPLATINUM_UNK_02095CD4_H

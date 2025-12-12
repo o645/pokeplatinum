@@ -63,7 +63,7 @@ static int sub_02095CE8(u8 slot)
 void sub_02095CFC(int param0, int param1, void *dest, void *param3)
 {
     FieldSystem *fieldSystem = (FieldSystem *)param3;
-    UnionTrade *unionTrade = fieldSystem->unk_88;
+    Trade *unionTrade = fieldSystem->unk_88;
 
     if (param0 != CommSys_CurNetId()) {
         memcpy((void *)unionTrade->friendParty, dest, (236 * 6 + 4 * 2));
@@ -85,7 +85,7 @@ void sub_02095CFC(int param0, int param1, void *dest, void *param3)
 
 void sub_02095D74(int param0, int param1, void *partySlot, void *param3)
 {
-    UnionTrade *unionTrade = ((FieldSystem *)param3)->unk_88;
+    Trade *unionTrade = ((FieldSystem *)param3)->unk_88;
     u8 *slot = (u8 *)partySlot;
 
     if (param0 != CommSys_CurNetId()) {
@@ -95,7 +95,7 @@ void sub_02095D74(int param0, int param1, void *partySlot, void *param3)
 
 void sub_02095D94(int param0, int param1, void *param2, void *param3)
 {
-    UnionTrade *v0 = ((FieldSystem *)param3)->unk_88;
+    Trade *v0 = ((FieldSystem *)param3)->unk_88;
     u8 *v1 = (u8 *)param2;
 
     v0->unk_60[param0] = *v1;
@@ -113,7 +113,7 @@ void sub_02095DA8(int param0, int param1, void *param2, void *param3)
 
 void sub_02095DAC(int param0, int param1, void *param2, void *param3)
 {
-    UnionTrade *v0 = ((FieldSystem *)param3)->unk_88;
+    Trade *v0 = ((FieldSystem *)param3)->unk_88;
     v0->unk_54 = 2;
 }
 
@@ -124,7 +124,7 @@ void sub_02095DB8(int param0, int param1, void *param2, void *param3)
 
 void sub_02095DBC(int param0, int param1, void *param2, void *param3)
 {
-    UnionTrade *v0 = ((FieldSystem *)param3)->unk_88;
+    Trade *v0 = ((FieldSystem *)param3)->unk_88;
     u8 *v1 = (u8 *)param2;
 
     v0->unk_2318 = *v1;
@@ -133,18 +133,18 @@ void sub_02095DBC(int param0, int param1, void *param2, void *param3)
 void sub_02095DCC(int param0, int param1, void *param2, void *param3)
 {
     FieldSystem *fieldSystem = (FieldSystem *)param3;
-    int v1;
-    u8 *v2 = GetRibbonData(fieldSystem->saveData);
+    int i;
+    u8 *ribbonData = GetRibbonData(fieldSystem->saveData);
     u8 *v3 = (u8 *)param2;
 
     if (CommSys_CurNetId() == param0) {
         return;
     }
 
-    for (v1 = 0; v1 < 14; v1++) {
-        if (v3[v1] != 0) {
-            if (v2[v1] != v3[v1]) {
-                v2[v1] = v3[v1];
+    for (i = 0; i < 14; i++) {
+        if (v3[i] != 0) {
+            if (ribbonData[i] != v3[i]) {
+                ribbonData[i] = v3[i];
             }
         }
     }
@@ -152,17 +152,17 @@ void sub_02095DCC(int param0, int param1, void *param2, void *param3)
 
 void sub_02095DFC(int param0, int param1, void *srcPalPad, void *param3)
 {
-    UnionTrade *unionTrade = ((FieldSystem *)param3)->unk_88;
+    Trade *unionTrade = ((FieldSystem *)param3)->unk_88;
 
     if (CommSys_CurNetId() != param0) {
-        PalPad_PushEntries(unionTrade->palPad, (PalPad *)srcPalPad, 1, HEAP_ID_26);
+        PalPad_PushEntries(unionTrade->playerPalPad, (PalPad *)srcPalPad, 1, HEAP_ID_26);
         unionTrade->unk_54 = 3;
     }
 }
 
 void sub_02095E28(int slot, int param1, void *srcChatotCry, void *param3)
 {
-    UnionTrade *unionTrade = ((FieldSystem *)param3)->unk_88;
+    Trade *unionTrade = ((FieldSystem *)param3)->unk_88;
 
     if (CommSys_CurNetId() != slot) {
         MI_CpuCopyFast(srcChatotCry, unionTrade->chatotCry[slot], 1000);
@@ -171,7 +171,7 @@ void sub_02095E28(int slot, int param1, void *srcChatotCry, void *param3)
     }
 }
 
-void sub_02095E60(FieldSystem *fieldSystem, UnionTrade *unionTrade)
+void sub_02095E60(FieldSystem *fieldSystem, Trade *unionTrade)
 {
     fieldSystem->unk_88 = unionTrade;
 }
@@ -199,6 +199,6 @@ static int sub_02095E78(void)
 
 static u8 *sub_02095E80(int param0, void *param1, int param2)
 {
-    UnionTrade *unionTrade = ((FieldSystem *)param1)->unk_88;
+    Trade *unionTrade = ((FieldSystem *)param1)->unk_88;
     return (u8 *)unionTrade->unk_234C[param0];
 }

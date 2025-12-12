@@ -16,7 +16,7 @@
 #include "string_list.h"
 #include "text.h"
 
-static void ov88_0223EE14(ListMenu *param0, u32 param1, u8 param2);
+static void ov88_0223EE14(ListMenu *unusedMenu, u32 unused, u8 param2);
 
 static const u16 Unk_ov88_0223F1A8[][5] = {
     { 0x4, 0x1, 0x9, 0x2, 0x1 },
@@ -48,7 +48,7 @@ static const u16 Unk_ov88_0223F170[][2] = {
 
 void ov88_0223E9C4(BgConfig *bgConfig, Window *window, Options *options)
 {
-    int v0;
+    int i;
 
     Window_Add(bgConfig, &window[0], 1, 2, 1, 10, 2, 8, 1);
     Window_FillTilemap(&window[0], 0);
@@ -74,14 +74,14 @@ void ov88_0223E9C4(BgConfig *bgConfig, Window *window, Options *options)
     Window_Add(bgConfig, &window[25], 0, 20, 19, 11, 4, 13, (((14 * 4) + (27 * 4)) + (11 * 6)));
     Window_FillTilemap(&window[25], 0);
 
-    for (v0 = 0; v0 < 14; v0++) {
-        Window_Add(bgConfig, &window[7 + v0], 1, Unk_ov88_0223F170[v0][0], Unk_ov88_0223F170[v0][1], 8, 2, 8, (((1 + (10 * 2)) + (10 * 2)) + (5 * 2)) + v0 * (8 * 2));
-        Window_FillTilemap(&window[7 + v0], 0);
+    for (i = 0; i < 14; i++) {
+        Window_Add(bgConfig, &window[7 + i], 1, Unk_ov88_0223F170[i][0], Unk_ov88_0223F170[i][1], 8, 2, 8, (((1 + (10 * 2)) + (10 * 2)) + (5 * 2)) + i * (8 * 2));
+        Window_FillTilemap(&window[7 + i], 0);
     }
 
-    for (v0 = 0; v0 < 8; v0++) {
-        Window_Add(bgConfig, &window[26 + v0], 4, Unk_ov88_0223F1A8[v0][0], Unk_ov88_0223F1A8[v0][1], Unk_ov88_0223F1A8[v0][2], Unk_ov88_0223F1A8[v0][3], 8, Unk_ov88_0223F1A8[v0][4]);
-        Window_FillTilemap(&window[26 + v0], 0);
+    for (i = 0; i < 8; i++) {
+        Window_Add(bgConfig, &window[26 + i], 4, Unk_ov88_0223F1A8[i][0], Unk_ov88_0223F1A8[i][1], Unk_ov88_0223F1A8[i][2], Unk_ov88_0223F1A8[i][3], 8, Unk_ov88_0223F1A8[i][4]);
+        Window_FillTilemap(&window[26 + i], 0);
     }
 }
 
@@ -124,12 +124,12 @@ void ov88_0223EC78(Window *window, Strbuf *stringBuffer, int unused, u32 renderD
     Text_AddPrinterWithParamsAndColor(window, FONT_SYSTEM, stringBuffer, finalXOffset, yOffset, renderDelay, TEXT_COLOR(11, 12, 0), NULL);
 }
 
-int UnionTrade_DisplayMessageFromEntry(Window *window, int entryId, int fontId, MessageLoader *messageLoader, StringTemplate *stringTemplate)
+int Trade_DisplayMessageFromEntry(Window *window, int entryId, int fontId, MessageLoader *messageLoader, StringTemplate *stringTemplate)
 {
-    Strbuf *v0;
-    int v1;
+    Strbuf *text;
+    int Message;
 
-    v0 = MessageUtil_ExpandedStrbuf(stringTemplate, messageLoader, entryId, HEAP_ID_26);
+    text = MessageUtil_ExpandedStrbuf(stringTemplate, messageLoader, entryId, HEAP_ID_26);
 
     if (fontId == 1) {
         Window_DrawMessageBoxWithScrollCursor(window, 0, (512 - (9 + (18 + 12))), 10);
@@ -138,10 +138,10 @@ int UnionTrade_DisplayMessageFromEntry(Window *window, int entryId, int fontId, 
     }
 
     Window_FillTilemap(window, 15);
-    v1 = Text_AddPrinterWithParamsAndColor(window, fontId, v0, 0, 0, TEXT_SPEED_INSTANT, TEXT_COLOR(1, 2, 15), NULL);
-    Strbuf_Free(v0);
+    Message = Text_AddPrinterWithParamsAndColor(window, fontId, text, 0, 0, TEXT_SPEED_INSTANT, TEXT_COLOR(1, 2, 15), NULL);
+    Strbuf_Free(text);
 
-    return v1;
+    return Message;
 }
 
 static const WindowTemplate Unk_ov88_YesNoWindowTemplate = {
@@ -166,7 +166,7 @@ u32 ov88_handleMenu(BgConfig *bgConfig, Menu **menu, int *param2)
     case 1:
         result = Menu_ProcessInputAndHandleExit(*menu, 26);
 
-        if (result != 0xffffffff) {
+        if (result != MENU_NOTHING_CHOSEN) {
             (*param2) = 0;
         }
     }
@@ -174,12 +174,12 @@ u32 ov88_handleMenu(BgConfig *bgConfig, Menu **menu, int *param2)
     return result;
 }
 
-void ov88_0223ED80(Window *param0)
+void ov88_drawwindowframeorsmthn(Window *window)
 {
-    Window_DrawStandardFrame(param0, 0, (512 - 9), 11);
+    Window_DrawStandardFrame(window, 0, (512 - 9), 11);
 }
 
-static const ListMenuTemplate Unk_ov88_0223F150 = {
+static const ListMenuTemplate Trade_FriendRosterMenuTemplate = {
     NULL,
     NULL,
     NULL,
@@ -201,27 +201,27 @@ static const ListMenuTemplate Unk_ov88_0223F150 = {
     NULL
 };
 
-ListMenu *ov88_0223ED94(StringList *param0, int param1, Window *param2, BgConfig *param3)
+ListMenu *Trade_SetupFriendRosterMenu(StringList *choices, int count, Window *window, BgConfig *menuBG)
 {
-    ListMenu *listMenu;
-    ListMenuTemplate listMenuTemplate;
-    int v2 = 5;
+    ListMenu *menu;
+    ListMenuTemplate mTemplate;
+    int maxDisplay = 5;
 
-    Window_Add(param3, param2, 0, 19, 1, 12, v2 * 2, 13, (512 - (9 + (18 + 12))) - (10 * (v2 + 2) * 2));
-    Window_DrawStandardFrame(param2, 0, (512 - 9), 11);
+    Window_Add(menuBG, window, 0, 19, 1, 12, maxDisplay * 2, 13, (512 - (9 + (18 + 12))) - (10 * (maxDisplay + 2) * 2));
+    Window_DrawStandardFrame(window, 0, (512 - 9), 11);
 
-    listMenuTemplate = Unk_ov88_0223F150;
-    listMenuTemplate.count = param1 + 1;
-    listMenuTemplate.maxDisplay = v2;
-    listMenuTemplate.choices = param0;
-    listMenuTemplate.window = param2;
-    listMenuTemplate.cursorCallback = ov88_0223EE14;
-    listMenu = ListMenu_New(&listMenuTemplate, 0, 0, HEAP_ID_26);
+    mTemplate = Trade_FriendRosterMenuTemplate;
+    mTemplate.count = count + 1;
+    mTemplate.maxDisplay = maxDisplay;
+    mTemplate.choices = choices;
+    mTemplate.window = window;
+    mTemplate.cursorCallback = ov88_0223EE14;
+    menu = ListMenu_New(&mTemplate, 0, 0, HEAP_ID_26);
 
-    return listMenu;
+    return menu;
 }
 
-static void ov88_0223EE14(ListMenu *param0, u32 param1, u8 param2)
+static void ov88_0223EE14(ListMenu *unusedMenu, u32 unused, u8 param2)
 {
     if (param2 == 0) {
         Sound_PlayEffect(SEQ_SE_CONFIRM);

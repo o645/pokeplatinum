@@ -56,10 +56,10 @@
 #define MSG_PAL_DELETE_FRIEND_FROM_ROSTER     60
 
 int ov88_0223B140(ApplicationManager *appMan, int *param1);
-int ov88_0223B57C(ApplicationManager *appMan, int *param1);
-int ov88_0223C03C(ApplicationManager *appMan, int *param1);
-void ov88_0223D044(int param0, int param1, int param2);
-void ov88_0223D058(UnionTrade *unionTrade, int param1, int param2);
-void ov88_0223D098(int param0, Party *param1, int param2);
+int ov88_0223B57C(ApplicationManager *appMan, int *step);
+int ov88_0223C03C(ApplicationManager *appMan, int *unused);
+void Trade_Sendu8Data(int netId, int cmd, int data);
+void ov88_0223D058(Trade *unionTrade, int cmd, int data);
+void ov88_0223D098(int netId, Party *party, int param2);
 
 #endif // POKEPLATINUM_OV88_0223B140_H

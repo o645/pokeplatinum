@@ -11,6 +11,6 @@ void include_unk_ov1_021D0DA0(void)
 
 static void NitroStaticInit(void)
 {
-    static int v0 = 0;
-    v0++;
+    static int init = 0;
+    init++;
 }
