@@ -13,7 +13,7 @@ void sub_02038ED4(int *param0)
 
 int sub_02038EDC(SaveData *saveData, int param1, int *param2)
 {
-    int v0;
+    int saveState;
 
     switch (*param2) {
     case 0:
@@ -27,12 +27,12 @@ int sub_02038EDC(SaveData *saveData, int param1, int *param2)
         }
         break;
     case 2:
-        v0 = SaveData_SaveStateMain(saveData);
+        saveState = SaveData_SaveStateMain(saveData);
 
-        GF_ASSERT(v0 != 2);
-        GF_ASSERT(v0 != 3);
+        GF_ASSERT(saveState != 2);
+        GF_ASSERT(saveState != 3);
 
-        if (v0 == 1) {
+        if (saveState == 1) {
             *param2 = 3;
             CommTiming_StartSync(112);
         }
@@ -43,12 +43,12 @@ int sub_02038EDC(SaveData *saveData, int param1, int *param2)
         }
         break;
     case 4:
-        v0 = SaveData_SaveStateMain(saveData);
+        saveState = SaveData_SaveStateMain(saveData);
 
-        GF_ASSERT(v0 != 3);
-        GF_ASSERT(v0 != 1);
+        GF_ASSERT(saveState != 3);
+        GF_ASSERT(saveState != 1);
 
-        if (v0 == 2) {
+        if (saveState == 2) {
             *param2 = 5;
         }
         break;

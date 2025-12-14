@@ -149,20 +149,20 @@ static BOOL ov59_021D2B5C(int param0, int param1)
 
 static void ov59_021D2B90(SaveData *saveData, UnkStruct_0202E794 *param1, UnkStruct_0202E768 *param2, int param3, int param4, int param5)
 {
-    int v0;
-    TrainerInfo *v1 = SaveData_GetTrainerInfo(saveData);
+    int i;
+    TrainerInfo *trainerInfo = SaveData_GetTrainerInfo(saveData);
 
-    for (v0 = 0; v0 < param3; v0++, param1++) {
+    for (i = 0; i < param3; i++, param1++) {
         MI_CpuClearFast(param1, sizeof(UnkStruct_0202E794));
 
-        param1->unk_00 = TrainerInfo_ID(v1);
-        param1->unk_04 = TrainerInfo_Gender(v1);
-        param1->unk_05 = GAME_VERSION;
-        param1->unk_06 = GAME_LANGUAGE;
+        param1->trainerId = TrainerInfo_ID(trainerInfo);
+        param1->trainerGender = TrainerInfo_Gender(trainerInfo);
+        param1->trainerGameVersion = GAME_VERSION;
+        param1->trainerLang = GAME_LANGUAGE;
 
-        CharCode_CopyNumChars(param1->unk_08, TrainerInfo_Name(v1), 7 + 1);
+        CharCode_CopyNumChars(param1->trainerName, TrainerInfo_Name(trainerInfo), 7 + 1);
 
-        param1->unk_18 = param2[v0].unk_00;
+        param1->unk_18 = param2[i].unk_00;
         param1->unk_18.unk_01 = 0;
 
         if ((param4 == 1) && (ov59_021D2B5C(param5, param1->unk_18.unk_00) == 0)) {
@@ -177,7 +177,7 @@ UnkStruct_0202E794 *ov59_021D2C28(SaveData *saveData, int heapID, u32 param2)
     TVBroadcast *broadcast = SaveData_GetTVBroadcast(saveData);
 
     GF_ASSERT(param2 == ov59_021D2B44(saveData));
-    ov59_021D2B90(saveData, v0, broadcast->interview, 4, 1, 3);
+    ov59_021D2B90(saveData, v0, broadcast->interviewData, 4, 1, 3);
 
     return v0;
 }
@@ -210,7 +210,7 @@ UnkStruct_0202E794 *ov59_021D2CF8(SaveData *saveData, int heapID, u32 param2)
     TVBroadcast *broadcast = SaveData_GetTVBroadcast(saveData);
 
     GF_ASSERT(param2 == ov59_021D2B44(saveData));
-    ov59_021D2B90(saveData, v0, broadcast->interview, 4, 0, 0);
+    ov59_021D2B90(saveData, v0, broadcast->interviewData, 4, 0, 0);
 
     return v0;
 }

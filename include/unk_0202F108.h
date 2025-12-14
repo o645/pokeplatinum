@@ -6,7 +6,7 @@
 #include "savedata.h"
 
 int Contest_SaveSize(void);
-void Contest_Init(UnkStruct_0202F10C *param0);
+void Contest_Init(ContestSaveData *param0);
 void sub_0202F134(SaveData *saveData, int param1, int param2);
 u16 sub_0202F160(SaveData *saveData, int param1, int param2);
 

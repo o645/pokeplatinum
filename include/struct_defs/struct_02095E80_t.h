@@ -88,7 +88,7 @@ struct UnionTradeData {
     StringList *options;
     Menu *pokemonActionMenu;
     int unk_6C8;
-    int unk_6CC;
+    int unused;
     int unk_6D0;
     int unk_6D4;
     VecFx32 unk_6D8[2];
@@ -123,7 +123,7 @@ struct UnionTradeData {
     u8 chatotCry[2][1004];
     int unk_3644[32];
     int friendNetId;
-    int unk_36C8;
+    int friendRosterSlot;
     StringTemplate *nameTemplate;
     MessageLoader *palPadMessages;
     StringList *friendList;

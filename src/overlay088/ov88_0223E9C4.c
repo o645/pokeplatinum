@@ -108,7 +108,7 @@ void ov88_RemoveWindows(Window *windowArray)
     Window_Remove(&windowArray[25]);
 }
 
-void ov88_0223EC78(Window *window, Strbuf *stringBuffer, int unused, u32 renderDelay, int xOffset, int yOffset)
+void Trade_DisplayMessageFromStringBuffer(Window *window, Strbuf *stringBuffer, int unused, u32 renderDelay, int xOffset, int yOffset)
 {
     int finalXOffset = 0;
 
@@ -154,7 +154,7 @@ static const WindowTemplate Unk_ov88_YesNoWindowTemplate = {
     0x112
 };
 
-u32 ov88_handleMenu(BgConfig *bgConfig, Menu **menu, int *param2)
+u32 Trade_handleMenu(BgConfig *bgConfig, Menu **menu, int *param2)
 {
     u32 result = 0xffffffff;
 
@@ -174,7 +174,7 @@ u32 ov88_handleMenu(BgConfig *bgConfig, Menu **menu, int *param2)
     return result;
 }
 
-void ov88_drawwindowframeorsmthn(Window *window)
+void Trade_DrawWindowFrame(Window *window)
 {
     Window_DrawStandardFrame(window, 0, (512 - 9), 11);
 }

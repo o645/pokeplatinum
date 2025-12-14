@@ -20,10 +20,10 @@
 
 typedef struct {
     FieldSystem *fieldSystem;
-    StringTemplate *unk_04;
+    StringTemplate *stringTemplate;
     Sentence unk_08;
     UnkStruct_0209747C *unk_10;
-    MiscSaveBlock *unk_14;
+    MiscSaveBlock *miscSaveData;
     int unk_18;
     int unk_1C;
     u16 *unk_20;
@@ -38,13 +38,13 @@ void sub_0209B344(FieldTask *param0, u16 *param1)
     UnkStruct_0209B3AC *v1 = Heap_Alloc(HEAP_ID_FIELD3, sizeof(UnkStruct_0209B3AC));
 
     v1->fieldSystem = fieldSystem;
-    v1->unk_04 = StringTemplate_Default(HEAP_ID_FIELD3);
+    v1->stringTemplate = StringTemplate_Default(HEAP_ID_FIELD3);
     v1->unk_10 = sub_0209747C(2, 0, v1->fieldSystem->saveData, HEAP_ID_FIELD3);
-    v1->unk_14 = SaveData_MiscSaveBlock(fieldSystem->saveData);
+    v1->miscSaveData = SaveData_MiscSaveBlock(fieldSystem->saveData);
     v1->unk_20 = param1;
 
     sub_02014A9C(&v1->unk_08, 4);
-    MiscSaveBlock_IntroMsg(v1->unk_14, &v1->unk_08);
+    MiscSaveBlock_IntroMsg(v1->miscSaveData, &v1->unk_08);
     sub_02097520(v1->unk_10);
 
     v1->unk_18 = 0;
@@ -56,7 +56,7 @@ void sub_0209B344(FieldTask *param0, u16 *param1)
 static void sub_0209B3AC(UnkStruct_0209B3AC *param0)
 {
     sub_020974EC(param0->unk_10);
-    StringTemplate_Free(param0->unk_04);
+    StringTemplate_Free(param0->stringTemplate);
     Heap_Free(param0);
 }
 
@@ -92,7 +92,7 @@ static BOOL sub_0209B3C4(FieldTask *param0)
                 *v0->unk_20 = 1;
                 sub_02097540(v0->unk_10, &(v0->unk_08));
 
-                MiscSaveBlock_SetIntroMsg(v0->unk_14, &v0->unk_08);
+                MiscSaveBlock_SetIntroMsg(v0->miscSaveData, &v0->unk_08);
 
                 v0->unk_18 = 4;
             }

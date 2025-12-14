@@ -893,7 +893,7 @@ FieldBattleDTO *ov104_0223A580(BattleTower *battleTower, UnkStruct_ov104_02230BE
     SaveData *saveData = param1->saveData;
     Party *party = SaveData_GetParty(saveData);
 
-    FieldBattleDTO_InitFromGameState(v3, NULL, param1->saveData, param1->unk_1C, param1->journalEntry, param1->bagCursor, param1->unk_20);
+    FieldBattleDTO_InitFromGameState(v3, NULL, param1->saveData, param1->mapId, param1->journalEntry, param1->bagCursor, param1->battleSubscreenCursorOn);
 
     v3->background = BACKGROUND_BATTLE_TOWER;
     v3->terrain = TERRAIN_BATTLE_TOWER;

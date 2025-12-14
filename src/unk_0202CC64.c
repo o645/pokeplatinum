@@ -13,10 +13,10 @@ int ChatotCry_SaveSize(void)
     return sizeof(ChatotCry);
 }
 
-void ChatotCry_Init(ChatotCry *param0)
+void ChatotCry_Init(ChatotCry *cry)
 {
-    MI_CpuClear32(param0, sizeof(ChatotCry));
-    param0->exists = FALSE;
+    MI_CpuClear32(cry, sizeof(ChatotCry));
+    cry->exists = FALSE;
 }
 
 ChatotCry *ChatotCry_New(int heapID)
@@ -37,29 +37,29 @@ BOOL IsChatotCryDataValid(const ChatotCry *cry)
     return cry->exists;
 }
 
-void ResetChatotCryDataStatus(ChatotCry *param0)
+void ResetChatotCryDataStatus(ChatotCry *cry)
 {
-    param0->exists = FALSE;
+    cry->exists = FALSE;
 }
 
-const void *GetChatotCryAudioBuffer(const ChatotCry *param0)
+const void *GetChatotCryAudioBuffer(const ChatotCry *cry)
 {
-    return param0->data;
+    return cry->data;
 }
 
 void ProcessChatotCryAudioData(s8 *param0, const s8 *param1)
 {
-    int v0, v1 = 0;
+    int i, v1 = 0;
     s8 v2;
     u8 v3;
 
-    for (v0 = 0; v0 < 1000; v0++) {
-        v3 = param1[v0] & 0xf;
+    for (i = 0; i < 1000; i++) {
+        v3 = param1[i] & 0xf;
         v2 = v3 - 8;
 
         param0[v1] = v2 * 16;
 
-        v3 = param1[v0] >> 4;
+        v3 = param1[i] >> 4;
         v2 = v3 - 8;
 
         param0[v1 + 1] = v2 * 16;
@@ -70,25 +70,25 @@ void ProcessChatotCryAudioData(s8 *param0, const s8 *param1)
 
 void StoreProcessedAudioInChatotCryData(ChatotCry *param0, const s8 *param1)
 {
-    int v0, v1;
+    int i, count;
     s8 v2;
     u8 v3;
 
     param0->exists = TRUE;
-    v1 = 0;
+    count = 0;
 
-    for (v0 = 0; v0 < 1000 * 2; v0 += 2) {
-        v2 = (param1[v0] / 16);
+    for (i = 0; i < 1000 * 2; i += 2) {
+        v2 = (param1[i] / 16);
         v3 = v2 + 8;
 
-        param0->data[v1] = v3;
+        param0->data[count] = v3;
 
-        v2 = (param1[v0 + 1] / 16);
+        v2 = (param1[i + 1] / 16);
         v3 = v2 + 8;
 
-        param0->data[v1] |= (v3 << 4);
+        param0->data[count] |= (v3 << 4);
 
-        v1++;
+        count++;
     }
 }
 

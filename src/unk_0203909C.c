@@ -14,26 +14,26 @@
 #include "unk_0202ACE0.h"
 #include "unk_020366A0.h"
 
-int sub_0203909C(SaveData *saveData, DWCFriendData *param1, int *result)
+int sub_0203909C(SaveData *saveData, DWCFriendData *friendData, int *result)
 {
     int i;
     DWCUserData *userData = WiFiList_GetUserData(SaveData_GetWiFiList(saveData));
-    DWCFriendData *friendData = GetFriendDataById(SaveData_GetWiFiList(saveData), 0);
+    DWCFriendData *newFriendData = GetFriendDataById(SaveData_GetWiFiList(saveData), 0);
 
     *result = -1;
 
-    if (!DWC_IsValidFriendData(param1)) {
+    if (!DWC_IsValidFriendData(friendData)) {
         return 3;
     }
 
     for (i = 0; i < 32; i++) {
-        if (DWC_IsEqualFriendData(param1, friendData + i)) {
+        if (DWC_IsEqualFriendData(friendData, newFriendData + i)) {
             *result = i;
             return 0;
-        } else if ((DWC_GetGsProfileId(userData, param1) > 0) && (DWC_GetGsProfileId(userData, param1) == DWC_GetGsProfileId(userData, friendData + i))) {
+        } else if ((DWC_GetGsProfileId(userData, friendData) > 0) && (DWC_GetGsProfileId(userData, friendData) == DWC_GetGsProfileId(userData, newFriendData + i))) {
             *result = i;
             return 1;
-        } else if ((*result < 0) && !DWC_IsValidFriendData(friendData + i)) {
+        } else if ((*result < 0) && !DWC_IsValidFriendData(newFriendData + i)) {
             *result = i;
         }
     }
@@ -126,7 +126,7 @@ void AddFriendToPalPad(SaveData *saveData, int netId, int slot, int heapID, int 
 
     if (param4 == 0) {
         v4 = TrainerInfo_NameNewStrbuf(friendInfo, heapID);
-        sub_0202AF0C(wifiList, slot, v4);
+        SetFriendTrainerName(wifiList, slot, v4);
         Strbuf_Free(v4);
         sub_0202AE2C(wifiList, slot, 8, TrainerInfo_Gender(friendInfo));
         sub_0202AE2C(wifiList, slot, 0, TrainerInfo_ID(friendInfo));

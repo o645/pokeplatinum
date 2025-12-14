@@ -8,7 +8,7 @@
 typedef struct WiFiList_t {
     DWCUserData userData;
     DWCFriendData friendData[32];
-    UnkStruct_0202B370_sub1 unk_1C0[32];
+    FriendTrainerData friendTrainerData[32];
 } WiFiList;
 
 #endif // POKEPLATINUM_STRUCT_0202B370_H

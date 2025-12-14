@@ -9,16 +9,16 @@
 
 int Contest_SaveSize(void)
 {
-    return sizeof(UnkStruct_0202F10C);
+    return sizeof(ContestSaveData);
 }
 
-void Contest_Init(UnkStruct_0202F10C *param0)
+void Contest_Init(ContestSaveData *param0)
 {
-    int v0, v1;
+    int j, i;
 
-    for (v1 = 0; v1 < 5; v1++) {
-        for (v0 = 0; v0 < 4; v0++) {
-            param0->unk_00[v1][v0] = 0;
+    for (i = 0; i < 5; i++) {
+        for (j = 0; j < 4; j++) {
+            param0->unk_00[i][j] = 0;
         }
     }
 
@@ -27,10 +27,10 @@ void Contest_Init(UnkStruct_0202F10C *param0)
 
 void sub_0202F134(SaveData *saveData, int param1, int param2)
 {
-    UnkStruct_0202F10C *v0 = SaveData_SaveTable(saveData, SAVE_TABLE_ENTRY_CONTESTS);
+    ContestSaveData *data = SaveData_SaveTable(saveData, SAVE_TABLE_ENTRY_CONTESTS);
 
-    if (v0->unk_00[param1][param2] < 9999) {
-        v0->unk_00[param1][param2]++;
+    if (data->unk_00[param1][param2] < 9999) {
+        data->unk_00[param1][param2]++;
     }
 
     SaveData_SetChecksum(SAVE_TABLE_ENTRY_CONTESTS);
@@ -38,8 +38,8 @@ void sub_0202F134(SaveData *saveData, int param1, int param2)
 
 u16 sub_0202F160(SaveData *saveData, int param1, int param2)
 {
-    UnkStruct_0202F10C *v0 = SaveData_SaveTable(saveData, SAVE_TABLE_ENTRY_CONTESTS);
+    ContestSaveData *data = SaveData_SaveTable(saveData, SAVE_TABLE_ENTRY_CONTESTS);
     SaveData_Checksum(SAVE_TABLE_ENTRY_CONTESTS);
 
-    return v0->unk_00[param1][param2];
+    return data->unk_00[param1][param2];
 }

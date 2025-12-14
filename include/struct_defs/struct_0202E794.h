@@ -4,11 +4,11 @@
 #include "struct_defs/struct_0202E4D4.h"
 
 typedef struct UnkStruct_0202E794_t {
-    u32 unk_00;
-    u8 unk_04;
-    u8 unk_05;
-    u8 unk_06;
-    u16 unk_08[8];
+    u32 trainerId;
+    u8 trainerGender;
+    u8 trainerGameVersion;
+    u8 trainerLang;
+    u16 trainerName[8];
     UnkStruct_0202E4D4 unk_18;
 } UnkStruct_0202E794;
 

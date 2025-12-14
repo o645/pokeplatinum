@@ -787,7 +787,7 @@ static u32 ov64_0222E09C(UnkStruct_ov64_0222E060 *param0, Strbuf *param1, Strbuf
                 v6 = GetFriendDataById(v1, v0);
                 DWC_CreateFriendKeyToken(v6, v4);
 
-                sub_0202AF0C(v1, v0, param2);
+                SetFriendTrainerName(v1, v0, param2);
                 sub_0202AE2C(v1, v0, 8, 2);
                 return 0;
             } else {
@@ -1670,7 +1670,7 @@ static int ov64_0222F0C4(UnkStruct_ov64_0222F0C4 *param0, UnkStruct_ov64_0222E06
     case 12:
         v2 = ov64_0222FF38(param0);
         v1 = SaveData_GetWiFiList(param1->saveData);
-        sub_0202AF0C(v1, param1->unk_08.unk_04[v2], param1->unk_2C.unk_00);
+        SetFriendTrainerName(v1, param1->unk_08.unk_04[v2], param1->unk_2C.unk_00);
     case 13:
         ov64_0222F668(param0, param1, param2, heapID);
         StartScreenFade(FADE_BOTH_SCREENS, FADE_TYPE_UNK_17, FADE_TYPE_UNK_17, COLOR_BLACK, 6, 1, heapID);

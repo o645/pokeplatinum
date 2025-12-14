@@ -15,7 +15,7 @@ u32 sub_0202AD2C(WiFiList *param0, int param1, int param2);
 void sub_0202AE2C(WiFiList *param0, int param1, int param2, u32 param3);
 DWCFriendData *GetFriendDataById(WiFiList *param0, int param1);
 u16 *GetFriendTrainerName(WiFiList *param0, int param1);
-void sub_0202AF0C(WiFiList *param0, int param1, Strbuf *param2);
+void SetFriendTrainerName(WiFiList *param0, int param1, Strbuf *param2);
 u16 *sub_0202AF34(WiFiList *param0, int param1);
 void sub_0202AF50(WiFiList *param0, int param1, Strbuf *param2);
 BOOL wifiSlotHasValidFriendData(WiFiList *param0, int param1);

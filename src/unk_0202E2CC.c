@@ -193,17 +193,17 @@ BOOL TVBroadcast_SaveSegmentData(TVBroadcast *broadcast, int programTypeId, int 
 
 const u16 *sub_0202E4C8(const UnkStruct_0202E794 *param0)
 {
-    return param0->unk_08;
+    return param0->trainerName;
 }
 
 int sub_0202E4CC(const UnkStruct_0202E794 *param0)
 {
-    return param0->unk_06;
+    return param0->trainerLang;
 }
 
 int sub_0202E4D0(const UnkStruct_0202E794 *param0)
 {
-    return param0->unk_05;
+    return param0->trainerGameVersion;
 }
 
 UnkStruct_0202E4D4 *sub_0202E4D4(UnkStruct_0202E794 *param0)
@@ -449,7 +449,7 @@ UnkStruct_0202E7FC *sub_0202E7FC(TVBroadcast *broadcast)
     return &broadcast->unk_B04;
 }
 
-UnkStruct_0202E808 *TVBroadcast_GetSafariGameData(TVBroadcast *broadcast)
+SafariGameData *TVBroadcast_GetSafariGameData(TVBroadcast *broadcast)
 {
     return &broadcast->safariGame;
 }

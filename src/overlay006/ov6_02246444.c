@@ -94,15 +94,15 @@ int ov6_022464A4(const TvSegmentData *param0)
 
 static TvSegmentData *ov6_022464A8(FieldSystem *fieldSystem, UnkStruct_0202E794 *param1)
 {
-    TvSegmentData *v0 = Heap_Alloc(HEAP_ID_FIELD1, sizeof(TvSegmentData));
+    TvSegmentData *segmentData = Heap_Alloc(HEAP_ID_FIELD1, sizeof(TvSegmentData));
 
-    TVSegmentData_Clear(v0);
-    TvSegmentData_SetTrainerName(v0, sub_0202E4C8(param1));
-    TvSegmentData_SetLang(v0, sub_0202E4CC(param1));
-    TvSegmentData_SetGameVersion(v0, sub_0202E4D0(param1));
-    ov6_02246468(v0, sub_0202E4D4(param1));
+    TVSegmentData_Clear(segmentData);
+    TvSegmentData_SetTrainerName(segmentData, sub_0202E4C8(param1));
+    TvSegmentData_SetLang(segmentData, sub_0202E4CC(param1));
+    TvSegmentData_SetGameVersion(segmentData, sub_0202E4D0(param1));
+    ov6_02246468(segmentData, sub_0202E4D4(param1));
 
-    return v0;
+    return segmentData;
 }
 
 static TvSegmentData *ov6_022464F8(FieldSystem *fieldSystem, UnkStruct_0202E768 *param1)

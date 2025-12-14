@@ -3,6 +3,6 @@
 
 typedef struct {
     u16 unk_00[5][4];
-} UnkStruct_0202F10C;
+} ContestSaveData;
 
 #endif // POKEPLATINUM_STRUCT_0202F10C_H
