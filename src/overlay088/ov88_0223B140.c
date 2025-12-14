@@ -134,7 +134,7 @@ static int Trade_SelectFriendsPokemon(Trade *unionTrade);
 static int ov88_0223D318(Trade *unionTrade);
 static int ov88_0223D2C4(Trade *unionTrade);
 static int ov88_0223DB48(Trade *unionTrade);
-static int ov88_0223DC84(Trade *unionTrade);
+static int Trade_SelectMonForTrade(Trade *unionTrade);
 static int ov88_0223DCE0(Trade *unionTrade);
 static int Trade_HandleSelectingFriendsMon(Trade *unionTrade);
 static int ov88_0223D434(Trade *unionTrade);
@@ -155,7 +155,7 @@ static void ov88_0223DE7C(Sprite *pokemonSprite, Sprite *mailSprite, Sprite *cap
 static void ov88_0223BDA4(Trade *trade, int slot);
 static void ov88_0223E848(Trade *unionTrade);
 static void ov88_0223C860(Window *window, Party *party, int param2, int param3, int param4);
-static int ov88_AskToDeleteFriendFromFullRoster(Trade *unionTrade);
+static int Trade_AskToDeleteFriendFromFullRoster(Trade *unionTrade);
 static int ov88_AskToRegisterFriendInPalPad(Trade *unionTrade);
 static int ov88_0223D854(Trade *unionTrade);
 static int Trade_ShowFriendRosterMenuForReplacement(Trade *unionTrade);
@@ -587,7 +587,7 @@ static int ov88_0223B914(Trade *unionTrade)
             }
 
             if (CommSys_CurNetId() == 0) {
-                Trade_Sendu8Data(CommSys_CurNetId(), 31, LCRNG_RandMod(60) + 3);
+                Trade_SendByteData(CommSys_CurNetId(), 31, LCRNG_RandMod(60) + 3);
             }
 
             UnionTrade_SendRibbonData(unionTrade->saveData);
@@ -821,7 +821,7 @@ static int ov88_0223BED8(Trade *unionTrade)
 
     ov88_0223CFF4(&unionTrade->unk_14C[1], &unionTrade->selectedMonId[1], unionTrade->sprites[1], unionTrade->tradePokemonData, 1);
     ov88_0223CEF0(&unionTrade->unk_90);
-    ov88_0223D058(unionTrade, 23, unionTrade->selectedMonId[0]);
+    Trade_SendData(unionTrade, 23, unionTrade->selectedMonId[0]);
 
     return 1;
 }
@@ -1125,8 +1125,8 @@ static void ov88_0223C370(Trade *unionTrade, ApplicationManager *appMan)
     unionTrade->unk_60[1] = 0;
     unionTrade->unk_5C = 0;
     unionTrade->unk_2168 = 0;
-    unionTrade->data = -1;
-    unionTrade->cmd = -1;
+    unionTrade->lastSentData = -1;
+    unionTrade->lastSentCmd = -1;
     unionTrade->unk_2318 = 0;
     unionTrade->unk_3704 = 0;
     unionTrade->unk_3708 = 0;
@@ -1610,26 +1610,27 @@ static int ov88_0223CFF4(u32 *param0, int *selectedSlot, Sprite *monSprite, Trad
     return v2;
 }
 
-void Trade_Sendu8Data(int netId, int cmd, int data)
+void Trade_SendByteData(int netId, int cmd, int data)
 {
     u8 dataU8 = data;
     CommSys_SendData(cmd, &dataU8, 1);
 }
 
-void ov88_0223D058(Trade *unionTrade, int cmd, int data)
+void Trade_SendData(Trade *trade, int cmd, int data)
 {
-    if ((data != unionTrade->data) || (cmd != unionTrade->cmd)) {
-        Trade_Sendu8Data(CommSys_CurNetId(), cmd, data);
-        unionTrade->data = data;
-        unionTrade->cmd = cmd;
+    if ((data != trade->lastSentData) || (cmd != trade->lastSentCmd)) {
+        Trade_SendByteData(CommSys_CurNetId(), cmd, data);
+        trade->lastSentData = data;
+        trade->lastSentCmd = cmd;
     }
 }
 
-static void *ov88_0223D08C(Party *party, int param1)
+static void *Trade_TurnPartyIntoSendableData(Party *party, int param1)
 {
-    u32 v0 = (u32)party;
 
-    return (void *)(v0 + param1 * (236 * 6 + 4 * 2));
+    u32 partyData = (u32)party;
+
+    return (void *)(partyData + param1 * (236 * 6 + 4 * 2));
 }
 
 void ov88_0223D098(int netId, Party *party, int param2)
@@ -1637,7 +1638,7 @@ void ov88_0223D098(int netId, Party *party, int param2)
     if (CommSys_IsPlayerConnected(netId)) {
         u8 v0 = param2;
 
-        CommSys_SendDataHuge(22, ov88_0223D08C(party, param2), 236 * 6 + 4 * 2);
+        CommSys_SendDataHuge(22, Trade_TurnPartyIntoSendableData(party, param2), 236 * 6 + 4 * 2);
     }
 }
 
@@ -1714,43 +1715,43 @@ static const u8 Unk_ov88_visiblePages[] = {
     0x8
 };
 
-static void Trade_InitPokemonSummary(Trade *unionTrade, int isChatot)
+static void Trade_InitPokemonSummary(Trade *trade, int isChatot)
 {
     if (isChatot == 0) {
-        unionTrade->pokemonSummary.monData = unionTrade->playerParty;
-        unionTrade->pokemonSummary.monMax = Party_GetCurrentCount(unionTrade->playerData->currentParty);
+        trade->pokemonSummary.monData = trade->playerParty;
+        trade->pokemonSummary.monMax = Party_GetCurrentCount(trade->playerData->currentParty);
 
-        unionTrade->pokemonSummary.chatotCry = NULL;
-        PokemonSummaryScreen_SetPlayerProfile(&unionTrade->pokemonSummary, CommInfo_TrainerInfo(CommSys_CurNetId()));
+        trade->pokemonSummary.chatotCry = NULL;
+        PokemonSummaryScreen_SetPlayerProfile(&trade->pokemonSummary, CommInfo_TrainerInfo(CommSys_CurNetId()));
     } else {
-        unionTrade->pokemonSummary.monData = unionTrade->friendParty;
-        unionTrade->pokemonSummary.monMax = Party_GetCurrentCount(unionTrade->friendParty);
-        unionTrade->pokemonSummary.chatotCry = (ChatotCry *)unionTrade->chatotCry[CommSys_CurNetId() ^ 1];
-        PokemonSummaryScreen_SetPlayerProfile(&unionTrade->pokemonSummary, CommInfo_TrainerInfo(CommSys_CurNetId() ^ 1));
+        trade->pokemonSummary.monData = trade->friendParty;
+        trade->pokemonSummary.monMax = Party_GetCurrentCount(trade->friendParty);
+        trade->pokemonSummary.chatotCry = (ChatotCry *)trade->chatotCry[CommSys_CurNetId() ^ 1];
+        PokemonSummaryScreen_SetPlayerProfile(&trade->pokemonSummary, CommInfo_TrainerInfo(CommSys_CurNetId() ^ 1));
     }
 
-    unionTrade->pokemonSummary.dataType = SUMMARY_DATA_PARTY_MON;
-    unionTrade->pokemonSummary.monIndex = unionTrade->selectedMonId[0] % 6;
-    unionTrade->pokemonSummary.mode = SUMMARY_MODE_LOCK_MOVES;
-    unionTrade->pokemonSummary.move = 0;
-    unionTrade->pokemonSummary.showContest = PokemonSummaryScreen_ShowContestData(unionTrade->playerData->saveData);
-    unionTrade->pokemonSummary.dexMode = unionTrade->playerData->dexMode;
-    unionTrade->pokemonSummary.options = unionTrade->playerData->options;
-    unionTrade->pokemonSummary.specialRibbons = GetRibbonData(unionTrade->playerData->saveData);
+    trade->pokemonSummary.dataType = SUMMARY_DATA_PARTY_MON;
+    trade->pokemonSummary.monIndex = trade->selectedMonId[0] % 6;
+    trade->pokemonSummary.mode = SUMMARY_MODE_LOCK_MOVES;
+    trade->pokemonSummary.move = 0;
+    trade->pokemonSummary.showContest = PokemonSummaryScreen_ShowContestData(trade->playerData->saveData);
+    trade->pokemonSummary.dexMode = trade->playerData->dexMode;
+    trade->pokemonSummary.options = trade->playerData->options;
+    trade->pokemonSummary.specialRibbons = GetRibbonData(trade->playerData->saveData);
 
-    PokemonSummaryScreen_FlagVisiblePages(&unionTrade->pokemonSummary, Unk_ov88_visiblePages);
+    PokemonSummaryScreen_FlagVisiblePages(&trade->pokemonSummary, Unk_ov88_visiblePages);
 
-    unionTrade->appMan = ApplicationManager_New(&gPokemonSummaryScreenApp, &unionTrade->pokemonSummary, HEAP_ID_26);
-    unionTrade->isChatot = isChatot;
+    trade->appMan = ApplicationManager_New(&gPokemonSummaryScreenApp, &trade->pokemonSummary, HEAP_ID_26);
+    trade->isChatot = isChatot;
 }
 
 // cancel trade
-static int ov88_0223D2C4(Trade *unionTrade)
+static int ov88_0223D2C4(Trade *trade)
 {
-    Bg_FillTilemapRect(unionTrade->bgConfig, 0, 0, 0, 0, 32, 24, 0);
-    Trade_DisplayMessageFromEntry(&unionTrade->windows[WINDOW_MAIN_MESSAGES], MSG_CANCEL_TRADE, FONT_MESSAGE, unionTrade->tradeMessages, unionTrade->tradeStrTemplate);
+    Bg_FillTilemapRect(trade->bgConfig, 0, 0, 0, 0, 32, 24, 0);
+    Trade_DisplayMessageFromEntry(&trade->windows[WINDOW_MAIN_MESSAGES], MSG_CANCEL_TRADE, FONT_MESSAGE, trade->tradeMessages, trade->tradeStrTemplate);
 
-    unionTrade->nextFunction = ov88_0223D318;
+    trade->nextFunction = ov88_0223D318;
 
     return 0;
 }
@@ -1762,7 +1763,7 @@ static int ov88_0223D318(Trade *unionTrade)
         Bg_FillTilemapRect(unionTrade->bgConfig, 0, 0, 0, 0, 32, 24, 0);
         // message is "Waiting for your friend to finish..."
         Trade_DisplayMessageFromEntry(&unionTrade->windows[WINDOW_MAIN_MESSAGES], MSG_WAIT_FOR_FRIEND, FONT_MESSAGE, unionTrade->tradeMessages, unionTrade->tradeStrTemplate);
-        ov88_0223D058(unionTrade, 24, 1);
+        Trade_SendData(unionTrade, 24, 1);
         unionTrade->nextFunction = ov88_0223DA00;
         unionTrade->unk_5C = 0;
         break;
@@ -1815,7 +1816,7 @@ static int ov88_0223D4C4(Trade *unionTrade)
         break;
     case MENU_CANCELED:
         UnionTrade_DisplayMessageFromPalPadBank(unionTrade, MSG_PAL_FRIEND_ROSTER_FULL_ASK_DELETE);
-        unionTrade->nextFunction = ov88_AskToDeleteFriendFromFullRoster;
+        unionTrade->nextFunction = Trade_AskToDeleteFriendFromFullRoster;
         break;
     default:
         break;
@@ -1909,7 +1910,7 @@ static int Trade_ShowFriendRosterMenuForReplacement(Trade *unionTrade)
             }
         }
 
-        StringList_AddFromMessageBank(unionTrade->friendList, unionTrade->palPadMessages, MSG_PAL_CANCEL, 0xfffffffe);
+        StringList_AddFromMessageBank(unionTrade->friendList, unionTrade->palPadMessages, MSG_PAL_CANCEL, MENU_CANCELED);
         Strbuf_Free(friendName);
     }
 
@@ -1919,10 +1920,10 @@ static int Trade_ShowFriendRosterMenuForReplacement(Trade *unionTrade)
     return 0;
 }
 
-static int ov88_AskToDeleteFriendFromFullRoster(Trade *unionTrade)
+static int Trade_AskToDeleteFriendFromFullRoster(Trade *unionTrade)
 {
     TrainerInfo *friendInfo;
-    int v1;
+    int unused;
 
     switch (Trade_HandleMenu(unionTrade->bgConfig, &unionTrade->unk_6BC, &unionTrade->unk_6C8)) {
     case 0:
@@ -1958,7 +1959,7 @@ static int ov88_AskToRegisterFriendInPalPad(Trade *unionTrade)
 
         if (slot == 32) {
             UnionTrade_DisplayMessageFromPalPadBank(unionTrade, MSG_PAL_FRIEND_ROSTER_FULL_ASK_DELETE);
-            unionTrade->nextFunction = ov88_AskToDeleteFriendFromFullRoster;
+            unionTrade->nextFunction = Trade_AskToDeleteFriendFromFullRoster;
             return 0;
         }
 
@@ -2111,7 +2112,7 @@ static int ov88_0223DB48(Trade *unionTrade)
         Trade_DisplayMessageFromEntry(&unionTrade->windows[WINDOW_MAIN_MESSAGES], MSG_COMMUNICATING, FONT_MESSAGE, unionTrade->tradeMessages, unionTrade->tradeStrTemplate);
         Menu_Free(unionTrade->pokemonActionMenu, NULL);
         StringList_Free(unionTrade->options);
-        unionTrade->nextFunction = ov88_0223DC84;
+        unionTrade->nextFunction = Trade_SelectMonForTrade;
         break;
     case 2: // Cancel
     case MENU_CANCELED:
@@ -2126,11 +2127,11 @@ static int ov88_0223DB48(Trade *unionTrade)
     return 0;
 }
 
-static int ov88_0223DC84(Trade *unionTrade)
+static int Trade_SelectMonForTrade(Trade *unionTrade)
 {
     Bg_FillTilemapRect(unionTrade->bgConfig, 0, 0, 0, 0, 32, 24, 0);
     Trade_DisplayMessageFromEntry(&unionTrade->windows[WINDOW_MAIN_MESSAGES], MSG_COMMUNICATING, FONT_MESSAGE, unionTrade->tradeMessages, unionTrade->tradeStrTemplate);
-    ov88_0223D058(unionTrade, 24, 2);
+    Trade_SendData(unionTrade, 24, 2);
 
     unionTrade->nextFunction = ov88_0223DCE0;
 
@@ -2297,7 +2298,7 @@ static int ov88_ConfirmTradeMessage(Trade *unionTrade)
 
 static void ov88_0223E1AC(Trade *unionTrade)
 {
-    ov88_0223D058(unionTrade, 24, 3);
+    Trade_SendData(unionTrade, 24, 3);
     unionTrade->unk_5C = 1;
 }
 
@@ -2326,17 +2327,17 @@ static int ov88_0223E20C(Trade *unionTrade)
             case 1:
                 Trade_DisplayTradeMessage(unionTrade, 23, MSG_PLAYER_NONTRADABLE);
                 unionTrade->nextFunction = ov88_0223E41C;
-                ov88_0223D058(unionTrade, 24, 4);
+                Trade_SendData(unionTrade, 24, 4);
                 break;
             case 2:
                 Trade_DisplayTradeMessage(unionTrade, 23, MSG_FRIEND_NONTRADABLE);
                 unionTrade->nextFunction = ov88_0223E41C;
-                ov88_0223D058(unionTrade, 24, 4);
+                Trade_SendData(unionTrade, 24, 4);
                 break;
             }
         } else {
             unionTrade->nextFunction = ov88_0223E41C;
-            ov88_0223D058(unionTrade, 24, 4);
+            Trade_SendData(unionTrade, 24, 4);
         }
 
         break;
@@ -2344,7 +2345,7 @@ static int ov88_0223E20C(Trade *unionTrade)
         Bg_FillTilemapRect(unionTrade->bgConfig, 0, 0, 0, 0, 32, 24, 0);
         Trade_DisplayMessageFromEntry(&unionTrade->windows[WINDOW_MAIN_MESSAGES], MSG_COMMUNICATING, FONT_MESSAGE, unionTrade->tradeMessages, unionTrade->tradeStrTemplate);
         unionTrade->nextFunction = ov88_0223E41C;
-        ov88_0223D058(unionTrade, 24, 4);
+        Trade_SendData(unionTrade, 24, 4);
         break;
     default:
         break;
@@ -2373,7 +2374,7 @@ static int ov88_HandleBallCapsuleRemovalMenu(Trade *unionTrade)
         Bg_FillTilemapRect(unionTrade->bgConfig, 0, 0, 0, 0, 32, 24, 0);
         Trade_DisplayMessageFromEntry(&unionTrade->windows[WINDOW_MAIN_MESSAGES], MSG_COMMUNICATING, FONT_MESSAGE, unionTrade->tradeMessages, unionTrade->tradeStrTemplate);
         unionTrade->nextFunction = ov88_0223E41C;
-        ov88_0223D058(unionTrade, 24, 4);
+        Trade_SendData(unionTrade, 24, 4);
         break;
     default:
         break;

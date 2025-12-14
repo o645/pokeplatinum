@@ -58,8 +58,8 @@
 int ov88_0223B140(ApplicationManager *appMan, int *param1);
 int ov88_0223B57C(ApplicationManager *appMan, int *step);
 int ov88_0223C03C(ApplicationManager *appMan, int *unused);
-void Trade_Sendu8Data(int netId, int cmd, int data);
-void ov88_0223D058(Trade *unionTrade, int cmd, int data);
+void Trade_SendByteData(int netId, int cmd, int data);
+void Trade_SendData(Trade *unionTrade, int cmd, int data);
 void ov88_0223D098(int netId, Party *party, int param2);
 
 #endif // POKEPLATINUM_OV88_0223B140_H

@@ -132,8 +132,8 @@ struct UnionTradeData {
     WiFiList *wifiList;
     int unk_36F0;
     int unk_36F4;
-    int data;
-    int cmd;
+    int lastSentData;
+    int lastSentCmd;
     void *waitingWindow;
     int unk_3704;
     int unk_3708;

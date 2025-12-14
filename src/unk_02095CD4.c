@@ -71,7 +71,7 @@ void sub_02095CFC(int param0, int param1, void *dest, void *param3)
 
         if ((unionTrade->unk_58) * (236 * 6 + 4 * 2) >= Party_SaveSize()) {
             if (CommSys_CurNetId() == 1) {
-                ov88_0223D058(unionTrade, 27, 0);
+                Trade_SendData(unionTrade, 27, 0);
             } else {
                 ov88_0223D098(CommSys_CurNetId(), unionTrade->playerParty, unionTrade->unk_50);
             }
@@ -199,6 +199,6 @@ static int sub_02095E78(void)
 
 static u8 *sub_02095E80(int param0, void *param1, int param2)
 {
-    Trade *unionTrade = ((FieldSystem *)param1)->unk_88;
-    return (u8 *)unionTrade->unk_234C[param0];
+    Trade *trade = ((FieldSystem *)param1)->unk_88;
+    return (u8 *)trade->unk_234C[param0];
 }

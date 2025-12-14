@@ -74,36 +74,36 @@ int sub_02039140(SaveData *saveData, u64 friendKey, int *param2)
 
 BOOL sub_020391DC(SaveData *saveData, int *param1, int heapID)
 {
-    int v0, v1 = 0, v2;
-    DWCFriendData *v3 = GetFriendDataById(SaveData_GetWiFiList(saveData), 0);
-    DWCFriendData *v4;
+    int i, v1 = 0, slot;
+    DWCFriendData *destFriendData = GetFriendDataById(SaveData_GetWiFiList(saveData), 0);
+    DWCFriendData *srcFriendData;
 
-    for (v0 = 0; v0 < CommSys_ConnectedCount(); v0++) {
-        if (CommSys_CurNetId() == v0) {
+    for (i = 0; i < CommSys_ConnectedCount(); i++) {
+        if (CommSys_CurNetId() == i) {
             continue;
         }
 
-        v4 = CommInfo_DWCFriendData(v0);
+        srcFriendData = CommInfo_DWCFriendData(i);
 
-        if (v4 == NULL) {
+        if (srcFriendData == NULL) {
             continue;
         }
 
-        param1[v0] = sub_0203909C(saveData, v4, &v2);
+        param1[i] = sub_0203909C(saveData, srcFriendData, &slot);
 
-        GF_ASSERT(param1[v0] != 3);
+        GF_ASSERT(param1[i] != 3);
 
-        if (param1[v0] == 0) {
-            AddFriendToPalPad(saveData, v0, v2, heapID, 2);
+        if (param1[i] == 0) {
+            AddFriendToPalPad(saveData, i, slot, heapID, 2);
             CommInfo_SavePlayerRecord(saveData);
-        } else if (param1[v0] == 1) {
+        } else if (param1[i] == 1) {
             if (!CommMan_IsConnectedToWifi()) {
-                AddFriendToPalPad(saveData, v0, v2, heapID, 1);
-                MI_CpuCopy8(v4, &v3[v2], sizeof(DWCFriendData));
+                AddFriendToPalPad(saveData, i, slot, heapID, 1);
+                MI_CpuCopy8(srcFriendData, &destFriendData[slot], sizeof(DWCFriendData));
 
                 CommInfo_SavePlayerRecord(saveData);
             }
-        } else if (param1[v0] == 2) {
+        } else if (param1[i] == 2) {
             v1 = 1;
         }
     }

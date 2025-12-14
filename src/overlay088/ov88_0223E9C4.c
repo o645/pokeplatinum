@@ -154,7 +154,7 @@ static const WindowTemplate Unk_ov88_YesNoWindowTemplate = {
     0x112
 };
 
-u32 Trade_handleMenu(BgConfig *bgConfig, Menu **menu, int *param2)
+u32 Trade_HandleMenu(BgConfig *bgConfig, Menu **menu, int *param2)
 {
     u32 result = 0xffffffff;
 
