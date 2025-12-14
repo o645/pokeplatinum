@@ -280,7 +280,7 @@ static void sub_020492A0(FieldSystem *fieldSystem, StringTemplate *param1)
     TVBroadcast *broadcast = SaveData_GetTVBroadcast(fieldSystem->saveData);
     UnkStruct_0202E7E4 *v2 = sub_0202E7E4(broadcast);
 
-    MessageLoader_GetSpeciesName(v2->unk_02, HEAP_ID_FIELD1, v0);
+    MessageLoader_GetSpeciesName(v2->species, HEAP_ID_FIELD1, v0);
     sub_0204922C(param1, 0, v0, 0, GAME_LANGUAGE, 1);
 }
 
@@ -290,7 +290,7 @@ static void sub_020492D4(FieldSystem *fieldSystem, StringTemplate *param1)
     TVBroadcast *broadcast = SaveData_GetTVBroadcast(fieldSystem->saveData);
     UnkStruct_0202E810 *v2 = sub_0202E810(broadcast);
 
-    MessageLoader_GetSpeciesName(v2->unk_02, HEAP_ID_FIELD1, v0);
+    MessageLoader_GetSpeciesName(v2->species, HEAP_ID_FIELD1, v0);
     sub_0204922C(param1, 0, v0, 0, GAME_LANGUAGE, 1);
 }
 
@@ -302,8 +302,8 @@ static void sub_02049308(FieldSystem *fieldSystem, StringTemplate *param1)
 
     v0 = String_Init(64, HEAP_ID_FIELD1);
 
-    String_CopyChars(v0, v2->unk_06);
-    StringTemplate_SetString(param1, 0, v0, v2->unk_02, 1, GAME_LANGUAGE);
+    String_CopyChars(v0, v2->trainerName);
+    StringTemplate_SetString(param1, 0, v0, v2->gender, 1, GAME_LANGUAGE);
     String_Free(v0);
 }
 
@@ -380,7 +380,7 @@ static const TVInterview sInterviews[TV_PROGRAM_TYPE_INTERVIEWS_NUM_SEGMENTS] = 
 BOOL ScrCmd_GetCurrentSafariGameCaughtNum(ScriptContext *ctx)
 {
     TVBroadcast *broadcast;
-    UnkStruct_0202E808 *safariGame;
+    SafariGameData *safariGame;
     u16 *destVar = ScriptContext_GetVarPointer(ctx);
 
     broadcast = SaveData_GetTVBroadcast(ctx->fieldSystem->saveData);

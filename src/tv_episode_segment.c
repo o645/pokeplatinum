@@ -70,8 +70,8 @@
 
 static void FieldSystem_SaveTVEpisodeSegment(FieldSystem *fieldSystem, int programTypeID, int segmentID, const void *segment);
 static void SaveData_SaveTVEpisodeSegment(SaveData *saveData, int programTypeID, int segmentID, const void *segment);
-static u8 sub_0206DE4C(Pokemon *param0);
-static String *sub_0206F0D8(u16 param0, u32 heapID);
+static u8 sub_0206DE4C(Pokemon *pokemon);
+static String *TVEpisodeSegment_GetSpeciesName(u16 speciesId, u32 heapID);
 
 #define TV_EPISODE_SEGMENT_SIZE 40
 #define TEMPLATE_NAME_SIZE      MON_NAME_LEN + 1
@@ -178,21 +178,21 @@ typedef struct TVEpisodeSegment_HomeAndManor {
 } TVEpisodeSegment_HomeAndManor;
 
 typedef struct {
-    u16 unk_00;
-    u16 unk_02;
-    u8 unk_04;
-    u8 unk_05;
-    u8 unk_06;
-    u8 unk_07;
-} UnkStruct_0206DBE8;
+    u16 wins;
+    u16 species;
+    u8 gender;
+    u8 lang;
+    u8 metGame;
+    u8 isSingleBattle;
+} TVEpisodeSegment_BattleTowerMaster;
 
 typedef struct {
-    u16 unk_00;
-    u8 unk_02;
-    u8 unk_03;
-    u8 unk_04;
-    u32 unk_08;
-} UnkStruct_0206DC9C;
+    u16 species;
+    u8 gender;
+    u8 language;
+    u8 metGame;
+    u32 size;
+} TVEpisodeSegment_PokemonSize;
 
 typedef struct {
     u32 unk_00;
@@ -212,7 +212,7 @@ typedef struct {
 } UnkStruct_0206DE80;
 
 typedef struct {
-    u16 unk_00;
+    u16 trap;
     u16 unk_02;
 } UnkStruct_0206DF14;
 
@@ -316,8 +316,8 @@ typedef union TVEpisodeSegment {
     TVEpisodeSegment_CaptureTheFlagDigest captureTheFlagDigest;
     TVEpisodeSegment_HomeAndManor_NoFurniture homeAndManorNoFurniture;
     TVEpisodeSegment_HomeAndManor homeAndManor;
-    UnkStruct_0206DBE8 val18;
-    UnkStruct_0206DC9C val19;
+    TVEpisodeSegment_BattleTowerMaster battleTowerMaster;
+    TVEpisodeSegment_PokemonSize pokemonSize;
     UnkStruct_0206DD5C val20;
     UnkStruct_0206DE80 val21;
     UnkStruct_0206DF14 val22;
@@ -409,7 +409,7 @@ static const TVProgramType *TVBroadcast_GetProgramType(int programTypeID)
 
 static const TVProgramSegment *TVProgramType_GetSegment(const TVProgramType *programType, const UnkStruct_ov6_022465F4 *param1)
 {
-    int segmentID = ov6_022464A4(param1);
+    int segmentID = ov6_GetSegmentId(param1);
     GF_ASSERT(0 < segmentID && segmentID < programType->numSegments);
 
     return &(programType->segments[segmentID - 1]);
@@ -520,11 +520,11 @@ static void TVEpisodeSegment_SetTemplateOwnPokemonSpecies(StringTemplate *templa
     sub_0206CD94(template, idx, speciesName, 0, GAME_LANGUAGE, 1);
 }
 
-static void sub_0206CED0(int heapID, Pokemon *mon, u8 *param2, u16 *param3)
+static void sub_0206CED0(int heapID, Pokemon *mon, u8 *hasNickname, u16 *param3)
 {
-    *param2 = Pokemon_GetValue(mon, MON_DATA_HAS_NICKNAME, NULL);
+    *hasNickname = Pokemon_GetValue(mon, MON_DATA_HAS_NICKNAME, NULL);
 
-    if (*param2) {
+    if (*hasNickname) {
         String *string = String_Init(64, heapID);
 
         Pokemon_GetValue(mon, MON_DATA_NICKNAME_STRING, string);
@@ -533,12 +533,12 @@ static void sub_0206CED0(int heapID, Pokemon *mon, u8 *param2, u16 *param3)
     }
 }
 
-void sub_0206CF14(TVBroadcast *broadcast, Pokemon *param1, int param2, int param3, int param4)
+void sub_0206CF14(TVBroadcast *broadcast, Pokemon *pokemon, int param2, int param3, int param4)
 {
     UnkStruct_0202E7D8 *v0 = sub_0202E7D8(broadcast);
 
     v0->unk_00 = 1;
-    TVEpisodeSegment_CopyPokemonValues(param1, &v0->unk_02, &v0->unk_04, &v0->unk_05, &v0->unk_06);
+    TVEpisodeSegment_CopyPokemonValues(pokemon, &v0->species, &v0->gender, &v0->lang, &v0->metGame);
     v0->unk_08 = param2;
     v0->unk_07 = param3;
     v0->unk_09 = param4;
@@ -546,18 +546,18 @@ void sub_0206CF14(TVBroadcast *broadcast, Pokemon *param1, int param2, int param
     SaveData_SetChecksum(SAVE_TABLE_ENTRY_TV_BROADCAST);
 }
 
-void sub_0206CF48(TVBroadcast *broadcast, Pokemon *param1, int heapID)
+void sub_0206CF48(TVBroadcast *broadcast, Pokemon *pokemon, int heapID)
 {
     UnkStruct_0202E7E4 *v0 = sub_0202E7E4(broadcast);
 
     v0->unk_00 = 1;
     v0->unk_1F = 0;
-    v0->unk_1E = Pokemon_GetNature(param1);
+    v0->unk_1E = Pokemon_GetNature(pokemon);
 
-    TVEpisodeSegment_CopyPokemonValues(param1, &v0->unk_02, &v0->unk_04, &v0->unk_05, &v0->unk_06);
-    v0->unk_07 = Pokemon_GetValue(param1, MON_DATA_HAS_NICKNAME, NULL);
+    TVEpisodeSegment_CopyPokemonValues(pokemon, &v0->species, &v0->gender, &v0->lang, &v0->metGame);
+    v0->hasNickname = Pokemon_GetValue(pokemon, MON_DATA_HAS_NICKNAME, NULL);
 
-    sub_0206CED0(heapID, param1, &v0->unk_07, v0->unk_08);
+    sub_0206CED0(heapID, pokemon, &v0->hasNickname, v0->unk_08);
     SaveData_SetChecksum(SAVE_TABLE_ENTRY_TV_BROADCAST);
 }
 
@@ -604,7 +604,7 @@ void sub_0206CFE4(TVBroadcast *broadcast, BOOL param1, u16 param2)
 
 void TVBroadcast_ResetSafariGameData(TVBroadcast *broadcast)
 {
-    UnkStruct_0202E808 *safariGame = TVBroadcast_GetSafariGameData(broadcast);
+    SafariGameData *safariGame = TVBroadcast_GetSafariGameData(broadcast);
 
     safariGame->dummy = 1;
     safariGame->numPokemonCaught = 0;
@@ -614,7 +614,7 @@ void TVBroadcast_ResetSafariGameData(TVBroadcast *broadcast)
 
 void TVBroadcast_UpdateSafariGameData(TVBroadcast *broadcast, Pokemon *mon)
 {
-    UnkStruct_0202E808 *safariGame = TVBroadcast_GetSafariGameData(broadcast);
+    SafariGameData *safariGame = TVBroadcast_GetSafariGameData(broadcast);
 
     if (safariGame->numPokemonCaught == 0) {
         TVEpisodeSegment_CopyPokemonValues(mon, &safariGame->species, &safariGame->gender, &safariGame->language, &safariGame->metGame);
@@ -629,25 +629,25 @@ void sub_0206D048(TVBroadcast *broadcast, Pokemon *mon)
     UnkStruct_0202E810 *v0 = sub_0202E810(broadcast);
 
     v0->unk_00 = 1;
-    TVEpisodeSegment_CopyPokemonValues(mon, &v0->unk_02, &v0->unk_04, &v0->unk_05, &v0->unk_06);
-    v0->unk_07 = Pokemon_GetValue(mon, MON_DATA_HAS_NICKNAME, NULL);
+    TVEpisodeSegment_CopyPokemonValues(mon, &v0->species, &v0->gender, &v0->lang, &v0->metGame);
+    v0->hasNickname = Pokemon_GetValue(mon, MON_DATA_HAS_NICKNAME, NULL);
 
-    sub_0206CED0(HEAP_ID_FIELD2, mon, &v0->unk_07, v0->unk_08);
+    sub_0206CED0(HEAP_ID_FIELD2, mon, &v0->hasNickname, v0->unk_08);
     SaveData_SetChecksum(SAVE_TABLE_ENTRY_TV_BROADCAST);
 }
 
-void sub_0206D088(TVBroadcast *broadcast, u8 param1, const TrainerInfo *param2)
+void sub_0206D088(TVBroadcast *broadcast, u8 param1, const TrainerInfo *trainerInfo)
 {
     UnkStruct_0202E81C *v0 = sub_0202E81C(broadcast);
 
     v0->unk_00 = 1;
     v0->unk_01 = param1;
 
-    CharCode_Copy(v0->unk_06, TrainerInfo_Name(param2));
+    CharCode_Copy(v0->trainerName, TrainerInfo_Name(trainerInfo));
 
-    v0->unk_03 = TrainerInfo_RegionCode(param2);
-    v0->unk_04 = TrainerInfo_GameCode(param2);
-    v0->unk_02 = TrainerInfo_Gender(param2);
+    v0->regionCode = TrainerInfo_RegionCode(trainerInfo);
+    v0->gameCode = TrainerInfo_GameCode(trainerInfo);
+    v0->gender = TrainerInfo_Gender(trainerInfo);
 
     SaveData_SetChecksum(SAVE_TABLE_ENTRY_TV_BROADCAST);
 }
@@ -1014,7 +1014,7 @@ void FieldSystem_SaveTVEpisodeSegment_SafariGameSpecialNewsBulletin(FieldSystem 
     TVEpisodeSegment segments;
     TVEpisodeSegment_SafariGameSpecialNewsBulletin *safariGameSpecialNewsBulletin = &segments.safariGameSpecialNewsBulletin;
     TVBroadcast *broadcast = SaveData_GetTVBroadcast(fieldSystem->saveData);
-    UnkStruct_0202E808 *safariGame = TVBroadcast_GetSafariGameData(broadcast);
+    SafariGameData *safariGame = TVBroadcast_GetSafariGameData(broadcast);
 
     if (safariGame->numPokemonCaught == 0) {
         return;
@@ -1164,7 +1164,7 @@ static int TVEpisodeSegment_LoadMessage_PlantingAndWateringShow_NoBerries(FieldS
     return TVProgramTrainerSightings_Text_PlantingAndWateringShow_NoBerries;
 }
 
-void FieldSystem_SaveTVEpisodeSegment_SealClubShow(TVBroadcast *broadcast, Pokemon *param1, u8 ballSeal)
+void FieldSystem_SaveTVEpisodeSegment_SealClubShow(TVBroadcast *broadcast, Pokemon *mon, u8 ballSeal)
 {
     TVEpisodeSegment segments;
     TVEpisodeSegment_SealClubShow *sealClubShow = &segments.sealClubShow;
@@ -1172,7 +1172,7 @@ void FieldSystem_SaveTVEpisodeSegment_SealClubShow(TVBroadcast *broadcast, Pokem
     sealClubShow->ballSeal = ballSeal;
     sealClubShow->dummy = MTRNG_Next() % 3;
 
-    TVEpisodeSegment_CopyPokemonValues(param1, &sealClubShow->species, &sealClubShow->gender, &sealClubShow->language, &sealClubShow->metGame);
+    TVEpisodeSegment_CopyPokemonValues(mon, &sealClubShow->species, &sealClubShow->gender, &sealClubShow->language, &sealClubShow->metGame);
     TVBroadcast_SaveSegmentData(broadcast, TV_PROGRAM_TYPE_TRAINER_SIGHTINGS, TV_PROGRAM_SEGMENT_SEAL_CLUB_SHOW, (const u8 *)sealClubShow);
 }
 
@@ -1292,28 +1292,28 @@ static BOOL TVEpisodeSegment_IsEligible_HomeAndManor(FieldSystem *fieldSystem, U
     return SystemFlag_HandleFirstArrivalToZone(SaveData_GetVarsFlags(fieldSystem->saveData), HANDLE_FLAG_CHECK, FIRST_ARRIVAL_RESORT_AREA);
 }
 
-void sub_0206DBB0(SaveData *saveData, u32 param1, Pokemon *param2, BOOL param3)
+void sub_0206DBB0(SaveData *saveData, u32 wins, Pokemon *pokemon, BOOL isSingleBattle)
 {
     TVEpisodeSegment segments;
-    UnkStruct_0206DBE8 *v1 = &segments.val18;
+    TVEpisodeSegment_BattleTowerMaster *segment = &segments.battleTowerMaster;
 
-    TVEpisodeSegment_CopyPokemonValues(param2, &v1->unk_02, &v1->unk_04, &v1->unk_05, &v1->unk_06);
+    TVEpisodeSegment_CopyPokemonValues(pokemon, &segment->species, &segment->gender, &segment->lang, &segment->metGame);
 
-    v1->unk_00 = param1;
-    v1->unk_07 = param3;
+    segment->wins = wins;
+    segment->isSingleBattle = isSingleBattle;
 
-    sub_0206CD58(saveData, 3, 1, v1);
+    sub_0206CD58(saveData, 3, 1, segment);
 }
 
-static int sub_0206DBE8(FieldSystem *fieldSystem, StringTemplate *param1, UnkStruct_ov6_022465F4 *param2)
+static int sub_0206DBE8(FieldSystem *fieldSystem, StringTemplate *segmentTemplate, UnkStruct_ov6_022465F4 *param2)
 {
-    UnkStruct_0206DBE8 *v0 = ov6_02246498(param2);
+    TVEpisodeSegment_BattleTowerMaster *segment = ov6_02246498(param2);
 
-    TVEpisodeSegment_SetTemplateTrainerName(param1, 0, param2);
-    TVEpisodeSegment_SetTemplatePokemonSpecies(param1, 1, v0->unk_02, v0->unk_04, v0->unk_05, v0->unk_06);
-    StringTemplate_SetNumber(param1, 2, v0->unk_00, 4, PADDING_MODE_NONE, CHARSET_MODE_EN);
+    TVEpisodeSegment_SetTemplateTrainerName(segmentTemplate, 0, param2);
+    TVEpisodeSegment_SetTemplatePokemonSpecies(segmentTemplate, 1, segment->species, segment->gender, segment->lang, segment->metGame);
+    StringTemplate_SetNumber(segmentTemplate, 2, segment->wins, 4, PADDING_MODE_NONE, CHARSET_MODE_EN);
 
-    if (v0->unk_07) {
+    if (segment->isSingleBattle) {
         return 0;
     } else {
         return 1;
@@ -1322,37 +1322,37 @@ static int sub_0206DBE8(FieldSystem *fieldSystem, StringTemplate *param1, UnkStr
 
 static BOOL sub_0206DC3C(FieldSystem *fieldSystem, UnkStruct_ov6_022465F4 *param1)
 {
-    UnkStruct_0206DBE8 *v0 = ov6_02246498(param1);
+    TVEpisodeSegment_BattleTowerMaster *v0 = ov6_02246498(param1);
 
-    if (Pokedex_HasSeenSpecies(SaveData_GetPokedex(fieldSystem->saveData), v0->unk_02) == 0) {
+    if (Pokedex_HasSeenSpecies(SaveData_GetPokedex(fieldSystem->saveData), v0->species) == 0) {
         return 0;
     }
 
     return SystemFlag_HandleFirstArrivalToZone(SaveData_GetVarsFlags(fieldSystem->saveData), HANDLE_FLAG_CHECK, FIRST_ARRIVAL_FIGHT_AREA);
 }
 
-void sub_0206DC6C(FieldSystem *fieldSystem, u32 param1, Pokemon *param2)
+void sub_0206DC6C(FieldSystem *fieldSystem, u32 size, Pokemon *pokemon)
 {
     TVEpisodeSegment segments;
-    UnkStruct_0206DC9C *v1 = &segments.val19;
+    TVEpisodeSegment_PokemonSize *segment = &segments.pokemonSize;
 
-    TVEpisodeSegment_CopyPokemonValues(param2, &v1->unk_00, &v1->unk_02, &v1->unk_03, &v1->unk_04);
-    v1->unk_08 = param1;
-    FieldSystem_SaveTVEpisodeSegment(fieldSystem, TV_PROGRAM_TYPE_RECORDS, 3, v1);
+    TVEpisodeSegment_CopyPokemonValues(pokemon, &segment->species, &segment->gender, &segment->language, &segment->metGame);
+    segment->size = size;
+    FieldSystem_SaveTVEpisodeSegment(fieldSystem, TV_PROGRAM_TYPE_RECORDS, 3, segment);
 }
 
-static int sub_0206DC9C(FieldSystem *fieldSystem, StringTemplate *param1, UnkStruct_ov6_022465F4 *param2)
+static int sub_0206DC9C(FieldSystem *fieldSystem, StringTemplate *segmentTemplate, UnkStruct_ov6_022465F4 *param2)
 {
-    UnkStruct_0206DC9C *v0 = ov6_02246498(param2);
+    TVEpisodeSegment_PokemonSize *segment = ov6_02246498(param2);
 
-    TVEpisodeSegment_SetTemplateTrainerName(param1, 0, param2);
-    TVEpisodeSegment_SetTemplatePokemonSpecies(param1, 1, v0->unk_00, v0->unk_02, v0->unk_03, v0->unk_04);
+    TVEpisodeSegment_SetTemplateTrainerName(segmentTemplate, 0, param2);
+    TVEpisodeSegment_SetTemplatePokemonSpecies(segmentTemplate, 1, segment->species, segment->gender, segment->language, segment->metGame);
 
     {
-        u32 v1 = (((v0->unk_08 * 1000) / 254 + 5) / 10);
+        u32 inches = (((segment->size * 1000) / 254 + 5) / 10);
 
-        StringTemplate_SetNumber(param1, 2, v1 / 10, 3, PADDING_MODE_NONE, CHARSET_MODE_EN);
-        StringTemplate_SetNumber(param1, 3, v1 % 10, 1, PADDING_MODE_NONE, CHARSET_MODE_EN);
+        StringTemplate_SetNumber(segmentTemplate, 2, inches / 10, 3, PADDING_MODE_NONE, CHARSET_MODE_EN);
+        StringTemplate_SetNumber(segmentTemplate, 3, inches % 10, 1, PADDING_MODE_NONE, CHARSET_MODE_EN);
     }
 
     return 2;
@@ -1360,8 +1360,8 @@ static int sub_0206DC9C(FieldSystem *fieldSystem, StringTemplate *param1, UnkStr
 
 static BOOL sub_0206DD1C(FieldSystem *fieldSystem, UnkStruct_ov6_022465F4 *param1)
 {
-    UnkStruct_0206DC9C *v0 = ov6_02246498(param1);
-    return Pokedex_HasSeenSpecies(SaveData_GetPokedex(fieldSystem->saveData), v0->unk_00);
+    TVEpisodeSegment_PokemonSize *segment = ov6_02246498(param1);
+    return Pokedex_HasSeenSpecies(SaveData_GetPokedex(fieldSystem->saveData), segment->species);
 }
 
 void sub_0206DD38(FieldSystem *fieldSystem, u32 param1, u32 param2, u32 param3)
@@ -1465,17 +1465,17 @@ static const u16 Unk_020EFDDC[] = {
     0x2A
 };
 
-static u8 sub_0206DE4C(Pokemon *param0)
+static u8 sub_0206DE4C(Pokemon *pokemon)
 {
-    u8 v0 = 0, v1;
+    u8 res = 0, i;
 
-    for (v1 = 0; v1 < (NELEMS(Unk_020EFDDC)); v1++) {
-        if (Pokemon_GetValue(param0, Unk_020EFDDC[v1], NULL) == 1) {
-            v0++;
+    for (i = 0; i < (NELEMS(Unk_020EFDDC)); i++) {
+        if (Pokemon_GetValue(pokemon, Unk_020EFDDC[i], NULL) == 1) {
+            res++;
         }
     }
 
-    return v0;
+    return res;
 }
 
 static int sub_0206DE80(FieldSystem *fieldSystem, StringTemplate *param1, UnkStruct_ov6_022465F4 *param2)
@@ -1501,7 +1501,7 @@ void sub_0206DEEC(FieldSystem *fieldSystem, u16 param1, u16 param2)
     TVEpisodeSegment segments;
     UnkStruct_0206DF14 *v1 = &segments.val22;
 
-    v1->unk_00 = param1;
+    v1->trap = param1;
     v1->unk_02 = param2;
 
     if (v1->unk_02 > 999) {
@@ -1517,7 +1517,7 @@ static int sub_0206DF14(FieldSystem *fieldSystem, StringTemplate *param1, UnkStr
     UnkStruct_0206DF14 *v1 = ov6_02246498(param2);
 
     TVEpisodeSegment_SetTemplateTrainerName(param1, 0, param2);
-    StringTemplate_SetUndergroundTrapName(param1, 1, v1->unk_00);
+    StringTemplate_SetUndergroundTrapName(param1, 1, v1->trap);
 
     v0 = v1->unk_02;
 
@@ -1532,16 +1532,16 @@ static int sub_0206DF14(FieldSystem *fieldSystem, StringTemplate *param1, UnkStr
 void sub_0206DF60(FieldSystem *fieldSystem, u16 param1)
 {
     TVEpisodeSegment segments;
-    UnkStruct_0206DF88 *v1 = &segments.val23;
+    UnkStruct_0206DF88 *segment = &segments.val23;
 
-    v1->unk_00 = param1;
+    segment->unk_00 = param1;
 
-    if (v1->unk_00 > 999) {
-        v1->unk_00 = 999;
+    if (segment->unk_00 > 999) {
+        segment->unk_00 = 999;
     }
 
     if (param1 > 1) {
-        FieldSystem_SaveTVEpisodeSegment(fieldSystem, TV_PROGRAM_TYPE_RECORDS, 9, v1);
+        FieldSystem_SaveTVEpisodeSegment(fieldSystem, TV_PROGRAM_TYPE_RECORDS, 9, segment);
     }
 }
 
@@ -1741,7 +1741,7 @@ static int TVEpisodeSegment_LoadMessage_ContestHall(FieldSystem *fieldSystem, St
 {
     TVEpisodeSegment_ContestHall *contestHall = ov6_02246498(param2);
 
-    TVEpisodeSegment_SetTemplatePokemonSpecies(template, 0, contestHall->unk_00.unk_02, contestHall->unk_00.unk_04, contestHall->unk_00.unk_05, contestHall->unk_00.unk_06);
+    TVEpisodeSegment_SetTemplatePokemonSpecies(template, 0, contestHall->unk_00.species, contestHall->unk_00.gender, contestHall->unk_00.lang, contestHall->unk_00.metGame);
     StringTemplate_SetContestTypeName(template, 1, sub_020958B8(contestHall->unk_00.unk_08));
     StringTemplate_SetContestRankName(template, 2, sub_02095888(contestHall->unk_00.unk_07));
     StringTemplate_SetNumber(template, 3, contestHall->unk_00.unk_09, 1, PADDING_MODE_NONE, CHARSET_MODE_EN);
@@ -1758,7 +1758,7 @@ static int TVEpisodeSegment_LoadMessage_ContestHall(FieldSystem *fieldSystem, St
 static BOOL TVEpisodeSegment_IsEligible_ContestHall(FieldSystem *fieldSystem, UnkStruct_ov6_022465F4 *param1)
 {
     TVEpisodeSegment_ContestHall *contestHall = ov6_02246498(param1);
-    return Pokedex_HasSeenSpecies(SaveData_GetPokedex(fieldSystem->saveData), contestHall->unk_00.unk_02);
+    return Pokedex_HasSeenSpecies(SaveData_GetPokedex(fieldSystem->saveData), contestHall->unk_00.species);
 }
 
 void FieldSystem_SaveTVEpisodeSegment_RightOnPhotoCorner(FieldSystem *fieldSystem, u16 customMessageWord)
@@ -1866,7 +1866,7 @@ static int TVEpisodeSegment_LoadMessage_AmitySquareWatch(FieldSystem *fieldSyste
     TVEpisodeSegment_AmitySquareWatch *amitySquareWatch = ov6_02246498(param2);
 
     TVEpisodeSegment_SetTemplateTrainerName(template, 0, param2);
-    TVEpisodeSegment_SetTemplatePokemonSpecies(template, 1, amitySquareWatch->unk_00.unk_02, amitySquareWatch->unk_00.unk_04, amitySquareWatch->unk_00.unk_05, amitySquareWatch->unk_00.unk_06);
+    TVEpisodeSegment_SetTemplatePokemonSpecies(template, 1, amitySquareWatch->unk_00.species, amitySquareWatch->unk_00.gender, amitySquareWatch->unk_00.lang, amitySquareWatch->unk_00.metGame);
     StringTemplate_SetNatureName(template, 2, amitySquareWatch->unk_00.unk_1E);
     StringTemplate_SetCustomMessageWord(template, 5, amitySquareWatch->customWordMessage);
 
@@ -1903,12 +1903,12 @@ static int TVEpisodeSegment_LoadMessage_BattleFrontierFrontlineNews_Single(Field
     TVEpisodeSegment_BattleFrontierFrontlineNews_Single *battleFrontierFrontlineNewsSingle = ov6_02246498(param2);
 
     TVEpisodeSegment_SetTemplateTrainerName(template, 0, param2);
-    TVEpisodeSegment_SetTemplatePokemonSpecies(template, 1, battleFrontierFrontlineNewsSingle->unk_00.unk_02, battleFrontierFrontlineNewsSingle->unk_00.unk_04, battleFrontierFrontlineNewsSingle->unk_00.unk_05, battleFrontierFrontlineNewsSingle->unk_00.unk_06);
+    TVEpisodeSegment_SetTemplatePokemonSpecies(template, 1, battleFrontierFrontlineNewsSingle->unk_00.species, battleFrontierFrontlineNewsSingle->unk_00.gender, battleFrontierFrontlineNewsSingle->unk_00.lang, battleFrontierFrontlineNewsSingle->unk_00.metGame);
 
-    if (battleFrontierFrontlineNewsSingle->unk_00.unk_07) {
-        sub_0206CD94(template, 2, battleFrontierFrontlineNewsSingle->unk_00.unk_08, battleFrontierFrontlineNewsSingle->unk_00.unk_04, battleFrontierFrontlineNewsSingle->unk_00.unk_05, 1);
+    if (battleFrontierFrontlineNewsSingle->unk_00.hasNickname) {
+        sub_0206CD94(template, 2, battleFrontierFrontlineNewsSingle->unk_00.unk_08, battleFrontierFrontlineNewsSingle->unk_00.gender, battleFrontierFrontlineNewsSingle->unk_00.lang, 1);
     } else {
-        TVEpisodeSegment_SetTemplatePokemonSpecies(template, 2, battleFrontierFrontlineNewsSingle->unk_00.unk_02, battleFrontierFrontlineNewsSingle->unk_00.unk_04, battleFrontierFrontlineNewsSingle->unk_00.unk_05, battleFrontierFrontlineNewsSingle->unk_00.unk_06);
+        TVEpisodeSegment_SetTemplatePokemonSpecies(template, 2, battleFrontierFrontlineNewsSingle->unk_00.species, battleFrontierFrontlineNewsSingle->unk_00.gender, battleFrontierFrontlineNewsSingle->unk_00.lang, battleFrontierFrontlineNewsSingle->unk_00.metGame);
     }
 
     StringTemplate_SetCustomMessageWord(template, 3, battleFrontierFrontlineNewsSingle->customWordMessage);
@@ -2017,8 +2017,8 @@ static int TVEpisodeSegment_LoadMessage_BattleFrontierFrontlineNews_Multi(FieldS
     String *v2 = String_Init(64, HEAP_ID_FIELD1);
 
     TVEpisodeSegment_SetTemplateTrainerName(template, 0, param2);
-    String_CopyChars(v2, battleFrontierFrontlineNewsMulti->unk_00.unk_06);
-    StringTemplate_SetString(template, 1, v2, battleFrontierFrontlineNewsMulti->unk_00.unk_02, 0, battleFrontierFrontlineNewsMulti->unk_00.unk_03);
+    String_CopyChars(v2, battleFrontierFrontlineNewsMulti->unk_00.trainerName);
+    StringTemplate_SetString(template, 1, v2, battleFrontierFrontlineNewsMulti->unk_00.gender, 0, battleFrontierFrontlineNewsMulti->unk_00.regionCode);
     String_Free(v2);
     StringTemplate_SetCustomMessageWord(template, 2, battleFrontierFrontlineNewsMulti->customWordMessage);
 
@@ -2757,49 +2757,49 @@ static int sub_0206EF7C(FieldSystem *fieldSystem, StringTemplate *param1, UnkStr
 static int sub_0206F01C(FieldSystem *fieldSystem, StringTemplate *param1, UnkStruct_ov6_022465F4 *param2)
 {
     String *v0;
-    u16 v1, v2, v3;
+    u16 species, i, id;
     const Pokedex *pokedex = SaveData_GetPokedex(fieldSystem->saveData);
 
-    v1 = (LCRNG_Next() % (NATIONAL_DEX_COUNT - 1)) + 1;
+    species = (LCRNG_Next() % (NATIONAL_DEX_COUNT - 1)) + 1;
 
-    for (v2 = 1; v2 <= NATIONAL_DEX_COUNT; v2++) {
-        if (Pokedex_HasSeenSpecies(pokedex, v1) == TRUE) {
-            v3 = v1;
+    for (i = 1; i <= NATIONAL_DEX_COUNT; i++) {
+        if (Pokedex_HasSeenSpecies(pokedex, species) == TRUE) {
+            id = species;
             break;
         }
 
-        v1++;
+        species++;
 
-        if (v1 == NATIONAL_DEX_COUNT) {
-            v1 = 1;
+        if (species == NATIONAL_DEX_COUNT) {
+            species = 1;
         }
     }
 
-    v0 = sub_0206F0D8(v3, HEAP_ID_FIELD1);
+    v0 = TVEpisodeSegment_GetSpeciesName(id, HEAP_ID_FIELD1);
 
     StringTemplate_SetString(param1, 0, v0, 0, 1, GAME_LANGUAGE);
     String_Free(v0);
 
-    v1 = (LCRNG_Next() % 3);
+    species = (LCRNG_Next() % 3);
 
-    if (v1 == 0) {
+    if (species == 0) {
         return 8;
-    } else if (v1 == 1) {
-        v1 = (LCRNG_Next() % 34) + 25;
-        StringTemplate_SetNumber(param1, 1, v1, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
+    } else if (species == 1) {
+        species = (LCRNG_Next() % 34) + 25;
+        StringTemplate_SetNumber(param1, 1, species, 2, PADDING_MODE_NONE, CHARSET_MODE_EN);
         return 9;
     } else {
         return 10;
     }
 }
 
-static String *sub_0206F0D8(u16 param0, u32 heapID)
+static String *TVEpisodeSegment_GetSpeciesName(u16 speciesId, u32 heapID)
 {
-    MessageLoader *v0 = MessageLoader_Init(MSG_LOADER_LOAD_ON_DEMAND, NARC_INDEX_MSGDATA__PL_MSG, TEXT_BANK_SPECIES_NAME, heapID);
-    String *v1 = MessageLoader_GetNewString(v0, param0);
+    MessageLoader *speciesNames = MessageLoader_Init(MSG_LOADER_LOAD_ON_DEMAND, NARC_INDEX_MSGDATA__PL_MSG, TEXT_BANK_SPECIES_NAME, heapID);
+    String *name = MessageLoader_GetNewString(speciesNames, speciesId);
 
-    MessageLoader_Free(v0);
-    return v1;
+    MessageLoader_Free(speciesNames);
+    return name;
 }
 
 static BOOL sub_0206F100(FieldSystem *fieldSystem, UnkStruct_ov6_022465F4 *param1)
@@ -2842,7 +2842,7 @@ static int sub_0206F13C(FieldSystem *fieldSystem, StringTemplate *param1, UnkStr
 static int sub_0206F160(FieldSystem *fieldSystem, StringTemplate *param1, UnkStruct_ov6_022465F4 *param2)
 {
     String *v0;
-    u16 v1, v2;
+    u16 species, i;
     Pokemon *pokemon;
     Party *party;
     TrainerInfo *trainerInfo = SaveData_GetTrainerInfo(fieldSystem->saveData);
@@ -2854,20 +2854,20 @@ static int sub_0206F160(FieldSystem *fieldSystem, StringTemplate *param1, UnkStr
     TVEpisodeSegment_SetTemplatePokemonSpecies(param1, 0, Pokemon_GetValue(pokemon, MON_DATA_SPECIES, NULL), Pokemon_GetValue(pokemon, MON_DATA_GENDER, NULL), TrainerInfo_RegionCode(trainerInfo), TrainerInfo_GameCode(trainerInfo));
     StringTemplate_SetContestAccessoryName(param1, 1, LCRNG_Next() % 100);
 
-    v1 = (LCRNG_Next() % (NATIONAL_DEX_COUNT - 2) + 1);
+    species = (LCRNG_Next() % (NATIONAL_DEX_COUNT - 2) + 1);
 
-    for (v2 = 1; v2 <= NATIONAL_DEX_COUNT; v2++) {
-        if (Pokedex_HasSeenSpecies(pokedex, v1) == TRUE) {
-            v0 = sub_0206F0D8(v1, HEAP_ID_FIELD1);
+    for (i = 1; i <= NATIONAL_DEX_COUNT; i++) {
+        if (Pokedex_HasSeenSpecies(pokedex, species) == TRUE) {
+            v0 = TVEpisodeSegment_GetSpeciesName(species, HEAP_ID_FIELD1);
             StringTemplate_SetString(param1, 2, v0, 0, 1, GAME_LANGUAGE);
             String_Free(v0);
             break;
         }
 
-        v1++;
+        species++;
 
-        if (v1 >= NATIONAL_DEX_COUNT) {
-            v1 = 1;
+        if (species >= NATIONAL_DEX_COUNT) {
+            species = 1;
         }
     }
 

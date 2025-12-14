@@ -9,6 +9,6 @@ typedef struct {
     u8 language;
     u8 metGame;
     u8 numPokemonCaught;
-} UnkStruct_0202E808;
+} SafariGameData;
 
 #endif // POKEPLATINUM_STRUCT_0202E808_H

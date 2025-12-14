@@ -449,7 +449,7 @@ UnkStruct_0202E7FC *sub_0202E7FC(TVBroadcast *broadcast)
     return &broadcast->unk_B04;
 }
 
-UnkStruct_0202E808 *TVBroadcast_GetSafariGameData(TVBroadcast *broadcast)
+SafariGameData *TVBroadcast_GetSafariGameData(TVBroadcast *broadcast)
 {
     return &broadcast->safariGame;
 }

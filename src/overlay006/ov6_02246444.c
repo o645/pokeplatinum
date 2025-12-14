@@ -21,7 +21,7 @@
 #include "unk_0202E2CC.h"
 
 struct UnkStruct_ov6_022465F4_t {
-    u8 unk_00;
+    u8 segmentId;
     u8 unk_01;
     u8 unk_02;
     u8 unk_03;
@@ -56,7 +56,7 @@ static void ov6_0224645C(UnkStruct_ov6_022465F4 *param0, const u16 *param1)
 
 static void ov6_02246468(UnkStruct_ov6_022465F4 *param0, UnkStruct_0202E4D4 *param1)
 {
-    param0->unk_00 = sub_0202E55C(param1);
+    param0->segmentId = sub_0202E55C(param1);
     param0->unk_14 = param1;
 }
 
@@ -87,9 +87,9 @@ void *ov6_02246498(UnkStruct_ov6_022465F4 *param0)
     return sub_0202E574(param0->unk_14);
 }
 
-int ov6_022464A4(const UnkStruct_ov6_022465F4 *param0)
+int ov6_GetSegmentId(const UnkStruct_ov6_022465F4 *param0)
 {
-    return param0->unk_00;
+    return param0->segmentId;
 }
 
 static UnkStruct_ov6_022465F4 *ov6_022464A8(FieldSystem *fieldSystem, UnkStruct_0202E794 *param1)
@@ -126,7 +126,7 @@ static UnkStruct_ov6_022465F4 *ov6_02246550(FieldSystem *fieldSystem, int param1
     UnkStruct_ov6_022465F4 *v1 = Heap_Alloc(HEAP_ID_FIELD1, sizeof(UnkStruct_ov6_022465F4));
 
     ov6_02246444(v1);
-    v1->unk_00 = param1;
+    v1->segmentId = param1;
     ov6_0224645C(v1, TrainerInfo_Name(v0));
     ov6_02246450(v1, TrainerInfo_Gender(v0));
     ov6_02246454(v1, GAME_LANGUAGE);
